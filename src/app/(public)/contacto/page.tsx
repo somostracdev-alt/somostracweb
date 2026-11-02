@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: "Contacto",
 };
 
-export default function ContactPage() {
-  const site = getSiteContent();
+export default async function ContactPage() {
+  const site = await getSiteContent();
 
   return (
     <section className="px-5 py-16 md:px-[8%] md:py-24">

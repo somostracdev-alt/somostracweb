@@ -220,6 +220,4 @@ export const defaultSiteContent: SiteContent = {
   },
 };
 
-export function getSiteContent(): SiteContent {
-  return defaultSiteContent;
-}
+export { getSiteContent } from "@/lib/site-store";

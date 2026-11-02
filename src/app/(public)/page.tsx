@@ -7,8 +7,8 @@ import { ScrollWheel } from "@/components/scroll-wheel";
 import { ServiceGrid } from "@/components/service-grid";
 import { getSiteContent } from "@/content/site";
 
-export default function HomePage() {
-  const site = getSiteContent();
+export default async function HomePage() {
+  const site = await getSiteContent();
   const { hero, install, system, why } = site.home;
 
   return (
@@ -38,9 +38,7 @@ export default function HomePage() {
 
       <section className="px-5 py-20 md:px-[8%] md:py-28">
         <div className="max-w-[578px]">
-          <h2 className="font-display text-[26px] leading-none uppercase md:text-[34px]">
-            {install.title}
-          </h2>
+          <h2 className="font-display text-[26px] leading-none uppercase md:text-[34px]">{install.title}</h2>
           <Prose paragraphs={install.paragraphs} className="mt-6 text-sm md:text-base" />
           <div className="mt-6">
             <CtaButton href={install.ctaHref}>{install.ctaLabel}</CtaButton>

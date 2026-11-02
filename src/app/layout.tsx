@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Anton, Poppins } from "next/font/google";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { getSiteContent } from "@/content/site";
 import "./globals.css";
 
 const anton = Anton({
@@ -18,8 +15,6 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-const site = getSiteContent();
-
 export const metadata: Metadata = {
   title: {
     default: "TRAC",
@@ -33,11 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es-AR" className={`${anton.variable} ${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full bg-black font-sans text-base font-extralight text-white">
-        <SiteHeader site={site} />
-        <main>{children}</main>
-        <SiteFooter site={site} />
-      </body>
+      <body className="min-h-full bg-black font-sans text-base font-extralight text-white">{children}</body>
     </html>
   );
 }
