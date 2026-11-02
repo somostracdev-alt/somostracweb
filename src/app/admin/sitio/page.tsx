@@ -1,4 +1,4 @@
-import { AdminCard, AdminFlash, Field, ImageField, SaveButton } from "@/components/admin-form";
+import { AdminCard, AdminFlash, AdminForm, Field, ImageField, SaveButton } from "@/components/admin-form";
 import { getSiteContent } from "@/content/site";
 
 import { saveSiteChromeAction } from "../actions";
@@ -20,7 +20,7 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Se
         </p>
       </div>
       <AdminFlash ok={params.ok} error={params.error} />
-      <form action={saveSiteChromeAction} className="space-y-6">
+      <AdminForm action={saveSiteChromeAction} className="space-y-6">
         <AdminCard title="Marca">
           <Field label="Nombre" name="brandName" defaultValue={site.brand.name} />
           <ImageField label="Logo" name="logo" current={site.brand.logo} />
@@ -40,7 +40,7 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Se
           ))}
         </AdminCard>
         <SaveButton />
-      </form>
+      </AdminForm>
     </div>
   );
 }

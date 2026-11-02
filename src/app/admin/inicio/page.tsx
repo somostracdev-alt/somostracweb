@@ -1,4 +1,4 @@
-import { AdminCard, AdminFlash, Area, Field, ImageField, SaveButton } from "@/components/admin-form";
+import { AdminCard, AdminFlash, AdminForm, Area, Field, ImageField, SaveButton } from "@/components/admin-form";
 import { getSiteContent } from "@/content/site";
 
 import { saveHomeAction } from "../actions";
@@ -20,7 +20,7 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Se
         </p>
       </div>
       <AdminFlash ok={params.ok} error={params.error} />
-      <form action={saveHomeAction} className="space-y-6">
+      <AdminForm action={saveHomeAction} className="space-y-6">
         <AdminCard title="Hero">
           <Field label="Prefijo" name="prefix" defaultValue={hero.prefix} />
           <Area
@@ -56,7 +56,7 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Se
           <Area label="Párrafos" name="whyParagraphs" defaultValue={why.paragraphs.join("\n")} hint="Uno por línea." />
         </AdminCard>
         <SaveButton />
-      </form>
+      </AdminForm>
     </div>
   );
 }
