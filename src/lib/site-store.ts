@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { list, put } from "@vercel/blob";
 import { connection } from "next/server";
 import { cache } from "react";
 
@@ -15,6 +16,19 @@ import type { Locale } from "@/lib/locale";
 import { getLocale } from "@/lib/locale-server";
 
 const contentPath = path.join(process.cwd(), "data", "site-content.json");
+const contentBlobName = "content/site-content.json";
+const blobSetupError =
+  "En Vercel hay que crear un Blob store (Storage → Blob), conectarlo a este proyecto y redesplegar para poder guardar fotos y textos.";
+
+function blobConfigured() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+function requireWritableStore() {
+  if (process.env.VERCEL && !blobConfigured()) {
+    throw new Error(blobSetupError);
+  }
+}
 
 function asString(value: unknown, fallback: string) {
   return typeof value === "string" ? value : fallback;
@@ -148,16 +162,28 @@ function withSavedAssets(base: SiteContent, saved: SiteContent): SiteContent {
   return next;
 }
 
+async function readSavedContent(): Promise<SiteContent | null> {
+  if (blobConfigured()) {
+    const { blobs } = await list({ prefix: contentBlobName, limit: 10 });
+    const file = blobs.find((item) => item.pathname === contentBlobName);
+    if (!file) return null;
+    const response = await fetch(file.url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return mergeSiteContent(await response.json());
+  }
+
+  try {
+    const raw = await readFile(contentPath, "utf8");
+    return mergeSiteContent(JSON.parse(raw) as unknown);
+  } catch {
+    return null;
+  }
+}
+
 export const getSiteContent = cache(async (locale?: Locale): Promise<SiteContent> => {
   await connection();
   const lang = locale ?? (await getLocale());
-  let saved: SiteContent;
-  try {
-    const raw = await readFile(contentPath, "utf8");
-    saved = mergeSiteContent(JSON.parse(raw) as unknown);
-  } catch {
-    saved = structuredClone(defaultSiteContent);
-  }
+  const saved = (await readSavedContent()) ?? structuredClone(defaultSiteContent);
   if (lang === "en") {
     return withSavedAssets(englishSiteContent, saved);
   }
@@ -165,8 +191,22 @@ export const getSiteContent = cache(async (locale?: Locale): Promise<SiteContent
 });
 
 export async function saveSiteContent(content: SiteContent) {
+  requireWritableStore();
+  const payload = JSON.stringify(content, null, 2);
+
+  if (blobConfigured()) {
+    await put(contentBlobName, payload, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+      cacheControlMaxAge: 60,
+    });
+    return;
+  }
+
   await mkdir(path.dirname(contentPath), { recursive: true });
-  await writeFile(contentPath, JSON.stringify(content, null, 2), "utf8");
+  await writeFile(contentPath, payload, "utf8");
 }
 
 const imageTypes = new Map([
@@ -187,14 +227,29 @@ export async function saveUploadedImage(file: FormDataEntryValue | null, prefix:
 
   const safePrefix = prefix.replace(/[^a-z0-9-]/gi, "").slice(0, 40) || "imagen";
   const filename = `${safePrefix}-${Date.now()}${extension}`;
+  const pathname = `uploads/${filename}`;
+
+  requireWritableStore();
+
+  if (blobConfigured()) {
+    const blob = await put(pathname, file, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: file.type,
+    });
+    return blob.url;
+  }
+
   const directory = path.join(process.cwd(), "public", "uploads");
   await mkdir(directory, { recursive: true });
   await writeFile(path.join(directory, filename), Buffer.from(await file.arrayBuffer()));
-  return `/uploads/${filename}`;
+  return `/${pathname}`;
 }
 
 export function publicAssetPath(value: string, fallback: string) {
   const next = value.trim();
-  if (!next.startsWith("/") || next.includes("..") || next.includes("\\")) return fallback;
-  return next;
+  if (next.includes("..") || next.includes("\\")) return fallback;
+  if (next.startsWith("https://")) return next;
+  if (next.startsWith("/")) return next;
+  return fallback;
 }

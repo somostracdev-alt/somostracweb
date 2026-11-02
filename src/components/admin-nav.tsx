@@ -30,7 +30,7 @@ export function AdminNav() {
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-xl px-3 py-2 text-sm ${active ? "bg-black text-white" : "hover:bg-black/5"}`}
+              className={`rounded-xl px-3 py-2 text-sm ${active ? "bg-accent text-white" : "hover:bg-accent/10"}`}
             >
               {link.label}
             </Link>

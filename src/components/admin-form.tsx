@@ -89,7 +89,7 @@ export function ImageField({
 
 export function SaveButton({ label = "Guardar" }: { label?: string }) {
   return (
-    <button type="submit" className="rounded-full bg-black px-5 py-2 text-sm uppercase tracking-wide text-white">
+    <button type="submit" className="rounded-full bg-accent px-5 py-2 text-sm uppercase tracking-wide text-white">
       {label}
     </button>
   );

@@ -41,8 +41,8 @@ async function edit(redirectTo: string, update: (content: SiteContent) => Promis
     console.error("[admin] guardar", error);
     const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
     const message =
-      code === "EROFS" || code === "EPERM"
-        ? "Este hosting no puede guardar archivos. El panel funciona en local; en Vercel hace falta una base."
+      code === "EROFS" || code === "EPERM" || code === "ENOENT"
+        ? "Este hosting no puede guardar archivos locales. Creá un Blob store en Vercel (Storage → Blob) y redesplegá."
         : error instanceof Error
           ? error.message
           : "No se pudo guardar. Probá de nuevo.";
