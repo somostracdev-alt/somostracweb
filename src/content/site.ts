@@ -15,6 +15,7 @@ export type ServiceItem = {
   title: string;
   paragraphs: string[];
   icon: string;
+  image: string;
 };
 
 /** Contenido editable. Cada bloque pasa a un formulario del admin. */
@@ -78,6 +79,7 @@ export type SiteContent = {
     title: string;
     nameLabel: string;
     emailLabel: string;
+    phoneLabel: string;
     messageLabel: string;
     submitLabel: string;
   };
@@ -105,7 +107,7 @@ export const defaultSiteContent: SiteContent = {
     whatsappHref: "https://wa.me/5491178234757",
   },
   footer: {
-    tagline: "Estrategia. Sistema. Performance.",
+    tagline: "Comercial para agro y pesados.",
     linksTitle: "Links",
     contactTitle: "Contacto",
     copyright: "© 2026 TRAC. Todos los derechos reservados.",
@@ -121,93 +123,97 @@ export const defaultSiteContent: SiteContent = {
       prefix: "SOMOS",
       rotating: ["TRAC.", "ESTRATEGIA.", "ESTRUCTURA.", "TRACCIÓN."],
       subtitle:
-        "Marketing y ventas dejan de ser acciones aisladas y pasan a ser un sistema que genera resultados.",
+        "Armamos el circuito comercial de concesionarias de agro y maquinaria pesada: demanda, seguimiento y cierre.",
       paragraphs: [
-        "No somos una agencia creativa ni una consultora teórica. Somos un equipo que entra al negocio, diseña el sistema que falta y lo pone a funcionar, con responsabilidad sobre el resultado.",
-        "Llevamos años dentro del rubro agro y pesados. Entendemos cómo se vende una maquinaria, cómo piensa el comprador y cómo se gestiona una red comercial real. Entramos al negocio sabiendo cómo hacerlo crecer.",
-        "El marketing es el motor. El sistema comercial es la transmisión. El performance es el resultado.",
+        "Entramos a la concesionaria. Ordenamos cómo entra la consulta, quién la atiende y con qué criterio se cierra.",
+        "Conocemos el rubro: cómo se cotiza una máquina, cómo decide el comprador y cómo opera una red de vendedores.",
+        "Si marketing, showroom y vendedores no comparten el mismo proceso, se pierden operaciones. Ese es el trabajo.",
       ],
       image: "/brand/hero.png",
     },
     install: {
       title: "Instalamos sistema comercial",
       paragraphs: [
-        "TRAC es un partner de performance comercial para concesionarias de agro y pesados. No hacemos acciones aisladas, intervenimos en todo el proceso, desde la generación de demanda hasta el cierre de la venta.",
-        "Diseñamos, implementamos, medimos y optimizamos cada etapa para lograr resultados sostenidos.",
+        "Nos ocupamos del proceso comercial de punta a punta: pauta, captura, CRM y seguimiento de la venta.",
+        "No entregamos una campaña y nos vamos. Nos quedamos en la operación hasta que el circuito funciona con el equipo de la concesionaria.",
       ],
       ctaLabel: "CONTACTANOS",
       ctaHref: "/contacto",
     },
     system: {
-      title: "Sistema completo\nde performance comercial",
+      title: "El circuito comercial,\nde la pauta al cierre",
       image: "/brand/system.png",
       ctaLabel: "CONOCÉ NUESTROS SERVICIOS",
       ctaHref: "/servicios",
     },
     why: {
-      title: "POR QUÉ TRAC",
+      title: "POR QUÉ TRAC?",
       paragraphs: [
-        "Diseñamos campañas, sí. Pero también las conectamos con el sistema comercial que las convierte en ventas reales.",
-        "Generamos demanda, sí. Pero también estructuramos el seguimiento para que cada lead se gestione, se mida y se cierre.",
-        "Optimizamos cada acción, sí. Pero también escalamos lo que funciona para que el crecimiento sea sostenido.",
+        "La pauta no sirve si el vendedor no sabe qué hacer con la consulta.",
+        "Un CRM vacío o mal cargado no da información para decidir.",
+        "Revisamos números todas las semanas: qué anuncio trae consultas, cuáles se pierden y dónde se frena la venta.",
       ],
     },
   },
   about: {
     title: "QUIENES SOMOS.",
     paragraphs: [
-      "Ayudamos a concesionarias a dejar atrás las acciones aisladas y construir un sistema comercial con estructura, seguimiento y optimización constante.",
-      "Cada decisión, campaña y proceso está pensado para generar rendimiento real y crecimiento sostenible.",
+      "Trabajamos con concesionarias de agro y pesados que ya venden, pero no tienen un circuito comercial ordenado.",
+      "El trabajo es operativo: definir oferta, captar demanda, registrar cada consulta y medir el cierre.",
     ],
-    storyTitle: "El sistema detrás del crecimiento",
+    storyTitle: "De dónde viene TRAC",
     storyParagraphs: [
-      "TRAC nace para resolver un problema común en muchas concesionarias: acciones comerciales sin estructura ni medición real.",
-      "Combinamos estrategia, marketing digital, seguimiento y optimización bajo una misma lógica de performance comercial.",
-      "No trabajamos con campañas aisladas. Diseñamos sistemas preparados para generar resultados sostenidos y escalables.",
+      "En muchas concesionarias el marketing, el showroom y los vendedores trabajan por separado. La consulta se pierde entre un anuncio, un WhatsApp y una planilla.",
+      "TRAC se armó para unir esas partes. Campaña, landing, CRM y seguimiento comercial, a cargo de un mismo equipo.",
+      "Entramos al negocio, vemos cómo se vende hoy y dejamos el proceso documentado y en marcha.",
     ],
   },
   services: {
     title: "SERVICIOS.",
     paragraphs: [
-      "Implementamos sistemas comerciales diseñados para generar demanda, mejorar la conversión y escalar resultados de forma medible.",
-      "Cada servicio forma parte de una estructura orientada a performance real.",
+      "Cuatro bloques. Se pueden tomar juntos o de a uno, según cómo esté la comercial hoy.",
+      "Estrategia, pauta, captura de consultas y ajuste semanal de lo que no cierra.",
     ],
     items: [
       {
         id: "estrategia",
         title: "Estrategia y arquitectura comercial",
         paragraphs: [
-          "Definimos el foco del negocio, estructuramos la captación y alineamos marketing con objetivos reales de venta.",
-          "Sin estrategia clara, no hay conversión.",
+          "Definimos a quién se le vende, con qué oferta y qué tiene que hacer marketing para que el vendedor tenga trabajo concreto.",
+          "Sale un plan de captación, canales y metas. No un diagnóstico para el cajón.",
         ],
         icon: "/brand/icon-estrategia.png",
+        image: "/brand/service-estrategia.jpg",
       },
       {
         id: "demanda",
         title: "Generación de demanda",
         paragraphs: [
-          "Diseñamos y gestionamos campañas en Meta y Google orientadas a resultados.",
-          "Cada acción tiene un objetivo, cada campaña se mide.",
+          "Armamos y operamos las campañas en Meta y Google para traer consultas de gente que está comprando máquina.",
+          "Cada anuncio tiene presupuesto, objetivo y reporte. Lo que no trae consultas se corta.",
         ],
         icon: "/brand/icon-demanda.png",
+        image: "/brand/service-demanda.jpg",
       },
       {
         id: "captura",
         title: "Sistema de captura y seguimiento",
         paragraphs: [
-          "Implementamos landing pages, integración con WhatsApp y CRM para registrar y gestionar cada lead.",
-          "Si no se mide el proceso, no se puede mejorar.",
+          "Landing, WhatsApp y CRM conectados: cada consulta queda registrada y asignada a un vendedor.",
+          "Sin ese registro no hay forma de saber cuántas operaciones se están perdiendo.",
         ],
         icon: "/brand/icon-captura.png",
+        image: "/brand/service-captura.jpg",
       },
       {
         id: "optimizacion",
         title: "Optimización y escalabilidad",
         paragraphs: [
-          "Analizamos datos, mejoramos la conversión y escalamos lo que funciona.",
-          "El crecimiento no es improvisado, es optimizado.",
+          "Leemos pauta, contactos y cierres. Ajustamos lo que no convierte y reforzamos lo que sí.",
+          "El criterio es más consultas útiles, menos plata tirada y un proceso que el equipo pueda sostener.",
         ],
         icon: "/brand/icon-optimizacion.png",
+        image: "/brand/service-optimizacion.jpg",
       },
     ],
   },
@@ -215,8 +221,9 @@ export const defaultSiteContent: SiteContent = {
     title: "Contacto",
     nameLabel: "Nombre",
     emailLabel: "Email",
+    phoneLabel: "Teléfono",
     messageLabel: "Mensaje",
-    submitLabel: "ENVIAR",
+    submitLabel: "Enviar por WhatsApp",
   },
 };
 

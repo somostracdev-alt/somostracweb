@@ -22,7 +22,7 @@ export function SocialLinks({ links }: { links: SocialLink[] }) {
   return (
     <div className="flex items-center gap-4">
       {links.map((link) => {
-        const className = "text-white transition-colors hover:text-accent";
+        const className = "text-foreground transition-colors hover:text-accent";
         if (!link.href.trim()) {
           return (
             <span key={link.id} aria-label={link.label} className={className}>

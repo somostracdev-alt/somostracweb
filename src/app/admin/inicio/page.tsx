@@ -9,7 +9,7 @@ export const instant = false;
 
 export default async function AdminHomePage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const { hero, install, system, why } = (await getSiteContent()).home;
+  const { hero, install, system, why } = (await getSiteContent("es")).home;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-10">

@@ -10,7 +10,7 @@ export function CtaButton({
   return (
     <Link
       href={href}
-      className="inline-flex border border-accent bg-black px-[15px] py-2 font-sans text-base font-semibold uppercase tracking-[1px] text-white transition-colors hover:border-white hover:bg-white hover:text-black"
+      className="inline-flex border border-accent px-5 py-2.5 font-sans text-sm font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
     >
       {children}
     </Link>

@@ -3,9 +3,10 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 import { getSiteContent } from "@/content/site";
 
-export const metadata: Metadata = {
-  title: "Quiénes somos",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteContent();
+  return { title: site.about.title.replace(/\.$/, "") };
+}
 
 export const instant = false;
 
@@ -15,12 +16,14 @@ export default async function AboutPage() {
   return (
     <>
       <section className="py-16 md:py-24">
-        <h1 className="font-display text-[30px] leading-none uppercase md:text-7xl lg:text-[100px]">{about.title}</h1>
-        <Prose paragraphs={about.paragraphs} className="mt-8 max-w-3xl text-sm md:text-base" />
+        <h1 className="page-title max-w-5xl">{about.title}</h1>
+        <Prose paragraphs={about.paragraphs} className="measure mt-10 md:mt-14" />
       </section>
-      <section className="pb-20 md:pb-28">
-        <h2 className="font-sans text-xl font-normal text-white md:text-2xl">{about.storyTitle}</h2>
-        <Prose paragraphs={about.storyParagraphs} className="mt-6 max-w-3xl text-sm md:text-base" />
+      <section className="page-section">
+        <h2 className="max-w-2xl font-sans text-xl font-normal tracking-wide text-foreground md:text-2xl md:leading-snug">
+          {about.storyTitle}
+        </h2>
+        <Prose paragraphs={about.storyParagraphs} className="measure mt-8 md:mt-10" />
       </section>
     </>
   );

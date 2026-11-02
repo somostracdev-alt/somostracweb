@@ -9,7 +9,7 @@ export const instant = false;
 
 export default async function AdminContactPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const site = await getSiteContent();
+  const site = await getSiteContent("es");
   const instagram = site.social.find((link) => link.id === "instagram")?.href ?? "";
   const linkedin = site.social.find((link) => link.id === "linkedin")?.href ?? "";
 
@@ -35,6 +35,7 @@ export default async function AdminContactPage({ searchParams }: { searchParams:
           <Field label="Título de la página" name="title" defaultValue={site.contactPage.title} />
           <Field label="Etiqueta nombre" name="nameLabel" defaultValue={site.contactPage.nameLabel} />
           <Field label="Etiqueta email" name="emailLabel" defaultValue={site.contactPage.emailLabel} />
+          <Field label="Etiqueta teléfono" name="phoneLabel" defaultValue={site.contactPage.phoneLabel} />
           <Field label="Etiqueta mensaje" name="messageLabel" defaultValue={site.contactPage.messageLabel} />
           <Field label="Botón enviar" name="submitLabel" defaultValue={site.contactPage.submitLabel} />
         </AdminCard>

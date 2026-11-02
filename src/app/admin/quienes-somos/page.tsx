@@ -9,7 +9,7 @@ export const instant = false;
 
 export default async function AdminAboutPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const about = (await getSiteContent()).about;
+  const about = (await getSiteContent("es")).about;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-10">

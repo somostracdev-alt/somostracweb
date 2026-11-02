@@ -33,7 +33,7 @@ async function edit(redirectTo: string, update: (content: SiteContent) => Promis
     redirect("/login?error=" + encodeURIComponent("Sesión de admin no válida"));
   }
 
-  const content = await getSiteContent();
+  const content = await getSiteContent("es");
   try {
     await update(content);
     await saveSiteContent(content);
@@ -73,6 +73,7 @@ export async function saveContactAction(formData: FormData) {
     content.contactPage.title = text(formData, "title");
     content.contactPage.nameLabel = text(formData, "nameLabel");
     content.contactPage.emailLabel = text(formData, "emailLabel");
+    content.contactPage.phoneLabel = text(formData, "phoneLabel");
     content.contactPage.messageLabel = text(formData, "messageLabel");
     content.contactPage.submitLabel = text(formData, "submitLabel");
   });
@@ -121,6 +122,7 @@ export async function saveServicesAction(formData: FormData) {
         title: text(formData, `${item.id}Title`),
         paragraphs: lines(formData, `${item.id}Paragraphs`),
         icon: await imageValue(formData, `${item.id}Icon`, item.icon),
+        image: await imageValue(formData, `${item.id}Image`, item.image),
       })),
     );
   });

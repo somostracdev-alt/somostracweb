@@ -6,7 +6,7 @@ export function Prose({
   className?: string;
 }) {
   return (
-    <div className={`space-y-4 font-extralight leading-[1.55] text-white ${className}`}>
+    <div className={`space-y-5 font-light leading-[1.75] text-muted ${className}`}>
       {paragraphs.map((paragraph) => (
         <p key={paragraph}>{paragraph}</p>
       ))}

@@ -59,13 +59,27 @@ export function Area({
   );
 }
 
-export function ImageField({ label, name, current }: { label: string; name: string; current: string }) {
+export function ImageField({
+  label,
+  name,
+  current,
+  wide = false,
+}: {
+  label: string;
+  name: string;
+  current: string;
+  wide?: boolean;
+}) {
   return (
     <div className="grid gap-2 text-sm">
       <span>{label}</span>
       {current ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={current} alt="" className="h-20 w-auto max-w-full object-contain" />
+        <img
+          src={current}
+          alt=""
+          className={wide ? "h-32 w-full max-w-md object-cover" : "h-20 w-auto max-w-full object-contain"}
+        />
       ) : null}
       <input name={name} type="text" defaultValue={current} className={controlClass} />
       <input name={`${name}File`} type="file" accept="image/png,image/jpeg,image/webp" className="text-sm" />

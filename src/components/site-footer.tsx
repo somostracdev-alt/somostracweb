@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import type { SiteContent } from "@/content/site";
 import { SocialLinks } from "@/components/social-links";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 
 function useCompactFooter(footerId: string) {
   const [compact, setCompact] = useState(false);
@@ -47,7 +48,25 @@ function useCompactFooter(footerId: string) {
   return compact;
 }
 
-export function SiteFooter({ site }: { site: SiteContent }) {
+export function SiteFooter({
+  site,
+  languageSwitch,
+  loginLabel,
+  whatsapp,
+}: {
+  site: SiteContent;
+  languageSwitch: React.ReactNode;
+  loginLabel: string;
+  whatsapp: {
+    greeting: string;
+    bubble: string;
+    open: string;
+    close: string;
+    label: string;
+    role: string;
+    messageLabel: string;
+  };
+}) {
   const compact = useCompactFooter("site-footer");
   const about = site.navigation.find((link) => link.id === "quienes") ?? {
     id: "quienes",
@@ -57,35 +76,31 @@ export function SiteFooter({ site }: { site: SiteContent }) {
 
   return (
     <>
-      <footer id="site-footer" className="border-t border-white/10 bg-black">
-        <div className="grid gap-10 py-14 md:grid-cols-3">
-          <p className="font-display text-2xl uppercase leading-tight tracking-[1px] md:text-3xl">
+      <footer id="site-footer" className="border-t border-line bg-background">
+        <div className="grid gap-12 py-16 md:grid-cols-3 md:gap-16 md:py-20">
+          <p className="max-w-xs font-display text-2xl uppercase leading-tight tracking-[0.04em] md:text-[1.75rem]">
             {site.footer.tagline}
           </p>
           <div>
-            <p className="mb-4 font-sans text-sm font-semibold uppercase tracking-[1px] text-accent">
-              {site.footer.linksTitle}
-            </p>
-            <ul className="space-y-2">
+            <p className="page-kicker">{site.footer.linksTitle}</p>
+            <ul className="space-y-3">
               {site.footer.links.map((link) => (
                 <li key={link.id}>
-                  <Link href={link.href} className="font-extralight transition-colors hover:text-accent">
+                  <Link href={link.href} className="font-light transition-colors hover:text-accent">
                     {link.label}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/login" className="font-extralight transition-colors hover:text-accent">
-                  Login
+                <Link href="/login" className="font-light transition-colors hover:text-accent">
+                  {loginLabel}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <p className="mb-4 font-sans text-sm font-semibold uppercase tracking-[1px] text-accent">
-              {site.footer.contactTitle}
-            </p>
-            <ul className="space-y-2 font-extralight">
+            <p className="page-kicker">{site.footer.contactTitle}</p>
+            <ul className="space-y-3 font-light">
               <li>
                 <a href={`mailto:${site.contact.email}`} className="transition-colors hover:text-accent">
                   {site.contact.email}
@@ -97,12 +112,13 @@ export function SiteFooter({ site }: { site: SiteContent }) {
                 </a>
               </li>
             </ul>
-            <div className="mt-6">
+            <div className="mt-8">
               <SocialLinks links={site.social} />
             </div>
+            <div className="mt-10">{languageSwitch}</div>
           </div>
         </div>
-        <p className="border-t border-white/10 py-5 text-center text-sm font-extralight text-white/70">
+        <p className="border-t border-line py-6 text-center text-sm font-light text-muted">
           {site.footer.copyright}
         </p>
       </footer>
@@ -110,23 +126,23 @@ export function SiteFooter({ site }: { site: SiteContent }) {
       <div
         inert={!compact}
         aria-hidden={!compact}
-        className={`fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-black/75 backdrop-blur-md transition-transform duration-300 motion-reduce:transition-none ${
+        className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-background/80 backdrop-blur-md transition-transform duration-300 motion-reduce:transition-none ${
           compact ? "translate-y-0" : "translate-y-full"
         }`}
       >
-        <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-16">
+        <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-12">
           <Link href="/" aria-label={site.brand.name} className="shrink-0">
             <Image
               src={site.brand.logo}
               alt=""
               width={482}
               height={128}
-              className="h-7 w-auto"
+              className="brand-logo h-7 w-auto"
             />
           </Link>
           <Link
             href={about.href}
-            className="truncate font-sans text-xs font-normal uppercase tracking-[1px] text-white transition-colors hover:text-accent sm:text-sm"
+            className="truncate font-sans text-xs font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-accent sm:text-sm"
           >
             {about.label}
           </Link>
@@ -134,25 +150,7 @@ export function SiteFooter({ site }: { site: SiteContent }) {
         </div>
       </div>
 
-      <WhatsAppButton href={site.contact.whatsappHref} lifted={compact} />
+      <WhatsAppButton href={site.contact.whatsappHref} lifted={compact} copy={whatsapp} />
     </>
-  );
-}
-
-export function WhatsAppButton({ href, lifted = false }: { href: string; lifted?: boolean }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="Escribir por WhatsApp"
-      className={`fixed right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-[bottom,transform] duration-300 hover:scale-105 motion-reduce:transition-none ${
-        lifted ? "bottom-20" : "bottom-5"
-      }`}
-    >
-      <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current" aria-hidden="true">
-        <path d="M20.5 3.5A11 11 0 0 0 2.1 16.8L1 23l6.4-1.1A11 11 0 0 0 20.5 3.5zm-8.5 17a9.1 9.1 0 0 1-4.6-1.3l-.3-.2-3.8.6.6-3.7-.2-.3A9.1 9.1 0 1 1 12 20.5zm5-6.8c-.3-.1-1.6-.8-1.8-.9s-.4-.1-.6.1-.7.9-.8 1-.3.2-.6.1a7.4 7.4 0 0 1-2.2-1.4 8.2 8.2 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.4-.5.2-.3a.5.5 0 0 0 0-.5c0-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.5 4 15 15 0 0 0 1.5.5 3.6 3.6 0 0 0 1.7.1 2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .2-1.2c-.1-.1-.3-.2-.6-.3z" />
-      </svg>
-    </a>
   );
 }

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 import { Prose } from "@/components/prose";
-import { ServiceGrid } from "@/components/service-grid";
+import { ServiceBlocks } from "@/components/service-grid";
 import { getSiteContent } from "@/content/site";
 
-export const metadata: Metadata = {
-  title: "Servicios",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteContent();
+  return { title: site.services.title.replace(/\.$/, "") };
+}
 
 export const instant = false;
 
@@ -14,11 +15,11 @@ export default async function ServicesPage() {
   const { services } = await getSiteContent();
 
   return (
-    <section className="py-16 md:py-24">
-      <h1 className="font-display text-[30px] leading-none uppercase md:text-7xl lg:text-[100px]">{services.title}</h1>
-      <Prose paragraphs={services.paragraphs} className="mt-8 max-w-3xl text-sm md:text-base" />
-      <div className="mt-14">
-        <ServiceGrid items={services.items} />
+    <section className="py-16 md:pb-28 md:pt-24">
+      <h1 className="page-title max-w-5xl">{services.title}</h1>
+      <Prose paragraphs={services.paragraphs} className="measure mt-10 md:mt-14" />
+      <div className="mt-16 md:mt-24">
+        <ServiceBlocks items={services.items} />
       </div>
     </section>
   );

@@ -18,7 +18,7 @@ export function RotatingWords({ words }: { words: string[] }) {
   const word = words[index] ?? "";
 
   return (
-    <span className="block overflow-hidden text-accent">
+    <span className="mt-1 block overflow-hidden text-accent">
       <span key={`${word}-${index}`} className="block animate-[trac-slide_0.45s_ease]">
         {word}
       </span>

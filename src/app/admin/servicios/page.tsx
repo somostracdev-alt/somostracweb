@@ -9,14 +9,14 @@ export const instant = false;
 
 export default async function AdminServicesPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const services = (await getSiteContent()).services;
+  const services = (await getSiteContent("es")).services;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold">Servicios</h1>
         <p className="mt-2 max-w-3xl text-black/70">
-          Estas tarjetas se ven en Inicio y en la página de Servicios. Un párrafo por línea.
+          Estas tarjetas se ven en Inicio y en la página de Servicios. La imagen aparece en Servicios. Un párrafo por línea.
         </p>
       </div>
       <AdminFlash ok={params.ok} error={params.error} />
@@ -30,6 +30,7 @@ export default async function AdminServicesPage({ searchParams }: { searchParams
             <Field label="Título" name={`${item.id}Title`} defaultValue={item.title} />
             <Area label="Párrafos" name={`${item.id}Paragraphs`} defaultValue={item.paragraphs.join("\n")} />
             <ImageField label="Ícono" name={`${item.id}Icon`} current={item.icon} />
+            <ImageField label="Imagen" name={`${item.id}Image`} current={item.image} wide />
           </AdminCard>
         ))}
         <SaveButton />

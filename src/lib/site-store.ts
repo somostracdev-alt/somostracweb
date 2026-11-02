@@ -3,6 +3,7 @@ import path from "path";
 import { connection } from "next/server";
 import { cache } from "react";
 
+import { englishSiteContent } from "@/content/en";
 import {
   defaultSiteContent,
   type ServiceItem,
@@ -10,6 +11,8 @@ import {
   type SiteLink,
   type SocialLink,
 } from "@/content/site";
+import type { Locale } from "@/lib/locale";
+import { getLocale } from "@/lib/locale-server";
 
 const contentPath = path.join(process.cwd(), "data", "site-content.json");
 
@@ -63,6 +66,7 @@ function asServices(value: unknown, fallback: ServiceItem[]) {
       ...item,
       title: asString(found.title, item.title),
       icon: asString(found.icon, item.icon),
+      image: asString(found.image, item.image),
       paragraphs: asLines(found.paragraphs, item.paragraphs),
     };
   });
@@ -120,20 +124,44 @@ function mergeSiteContent(saved: unknown): SiteContent {
   base.contactPage.title = asString(data.contactPage?.title, base.contactPage.title);
   base.contactPage.nameLabel = asString(data.contactPage?.nameLabel, base.contactPage.nameLabel);
   base.contactPage.emailLabel = asString(data.contactPage?.emailLabel, base.contactPage.emailLabel);
+  base.contactPage.phoneLabel = asString(data.contactPage?.phoneLabel, base.contactPage.phoneLabel);
   base.contactPage.messageLabel = asString(data.contactPage?.messageLabel, base.contactPage.messageLabel);
   base.contactPage.submitLabel = asString(data.contactPage?.submitLabel, base.contactPage.submitLabel);
 
   return base;
 }
 
-export const getSiteContent = cache(async (): Promise<SiteContent> => {
+function withSavedAssets(base: SiteContent, saved: SiteContent): SiteContent {
+  const next = structuredClone(base);
+  next.brand.logo = saved.brand.logo;
+  next.contact = { ...saved.contact };
+  next.social = saved.social.map((link) => {
+    const current = next.social.find((item) => item.id === link.id);
+    return current ? { ...current, href: link.href } : link;
+  });
+  next.home.hero.image = saved.home.hero.image;
+  next.home.system.image = saved.home.system.image;
+  next.services.items = next.services.items.map((item) => {
+    const found = saved.services.items.find((entry) => entry.id === item.id);
+    return found ? { ...item, icon: found.icon, image: found.image } : item;
+  });
+  return next;
+}
+
+export const getSiteContent = cache(async (locale?: Locale): Promise<SiteContent> => {
   await connection();
+  const lang = locale ?? (await getLocale());
+  let saved: SiteContent;
   try {
     const raw = await readFile(contentPath, "utf8");
-    return mergeSiteContent(JSON.parse(raw) as unknown);
+    saved = mergeSiteContent(JSON.parse(raw) as unknown);
   } catch {
-    return structuredClone(defaultSiteContent);
+    saved = structuredClone(defaultSiteContent);
   }
+  if (lang === "en") {
+    return withSavedAssets(englishSiteContent, saved);
+  }
+  return saved;
 });
 
 export async function saveSiteContent(content: SiteContent) {

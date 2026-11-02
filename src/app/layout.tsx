@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Poppins } from "next/font/google";
 
+import { getLocale } from "@/lib/locale-server";
 import "./globals.css";
 
 const anton = Anton({
@@ -15,20 +16,36 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "TRAC",
-    template: "%s – TRAC",
-  },
-  description:
-    "TRAC es un partner de performance comercial para concesionarias de agro y pesados.",
-  icons: { icon: "/brand/favicon.png" },
-};
+export const instant = false;
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return {
+    title: {
+      default: "TRAC",
+      template: "%s – TRAC",
+    },
+    description:
+      locale === "en"
+        ? "Sales systems for ag and heavy-equipment dealerships."
+        : "Sistema comercial para concesionarias de agro y maquinaria pesada.",
+    icons: { icon: "/brand/favicon.png" },
+  };
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
+
   return (
-    <html lang="es-AR" className={`${anton.variable} ${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full bg-black font-sans text-base font-extralight text-white">{children}</body>
+    <html lang={locale === "en" ? "en" : "es-AR"} className={`${anton.variable} ${poppins.variable} h-full antialiased`}>
+      <body className="min-h-full bg-background font-sans text-base font-light text-foreground">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("trac-theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
