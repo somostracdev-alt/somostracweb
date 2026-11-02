@@ -58,7 +58,7 @@ export function SiteFooter({ site }: { site: SiteContent }) {
   return (
     <>
       <footer id="site-footer" className="border-t border-white/10 bg-black">
-        <div className="grid gap-10 px-5 py-14 md:grid-cols-3 md:px-[8%]">
+        <div className="grid gap-10 py-14 md:grid-cols-3">
           <p className="font-display text-2xl uppercase leading-tight tracking-[1px] md:text-3xl">
             {site.footer.tagline}
           </p>
@@ -74,6 +74,11 @@ export function SiteFooter({ site }: { site: SiteContent }) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/login" className="font-extralight transition-colors hover:text-accent">
+                  Login
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
@@ -97,7 +102,7 @@ export function SiteFooter({ site }: { site: SiteContent }) {
             </div>
           </div>
         </div>
-        <p className="border-t border-white/10 px-5 py-5 text-center text-sm font-extralight text-white/70 md:px-[8%]">
+        <p className="border-t border-white/10 py-5 text-center text-sm font-extralight text-white/70">
           {site.footer.copyright}
         </p>
       </footer>
@@ -109,7 +114,7 @@ export function SiteFooter({ site }: { site: SiteContent }) {
           compact ? "translate-y-0" : "translate-y-full"
         }`}
       >
-        <div className="flex items-center justify-between gap-4 px-5 py-3 md:px-[8%]">
+        <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-16">
           <Link href="/" aria-label={site.brand.name} className="shrink-0">
             <Image
               src={site.brand.logo}

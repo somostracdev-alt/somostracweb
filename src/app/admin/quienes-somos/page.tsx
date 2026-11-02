@@ -5,6 +5,8 @@ import { saveAboutAction } from "../actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
+export const instant = false;
+
 export default async function AdminAboutPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const about = (await getSiteContent()).about;

@@ -5,6 +5,8 @@ import { saveHomeAction } from "../actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
+export const instant = false;
+
 export default async function AdminHomePage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const { hero, install, system, why } = (await getSiteContent()).home;

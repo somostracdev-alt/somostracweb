@@ -5,6 +5,8 @@ import { saveSiteChromeAction } from "../actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
+export const instant = false;
+
 export default async function AdminSitePage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const site = await getSiteContent();

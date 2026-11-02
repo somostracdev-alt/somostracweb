@@ -52,7 +52,7 @@ export function SiteHeader({ site }: { site: SiteContent }) {
         transparent ? "bg-black/25 backdrop-blur-md" : "bg-black"
       }`}
     >
-      <div className="grid grid-cols-3 items-center px-5 py-4 md:px-[8%] md:pt-[2%] md:pb-[1%]">
+      <div className="grid grid-cols-3 items-center py-4 md:pt-[2%] md:pb-[1%]">
         <SocialLinks links={site.social} />
         <Link href="/" className="justify-self-center" aria-label={site.brand.name}>
           <Image
@@ -99,7 +99,7 @@ export function SiteHeader({ site }: { site: SiteContent }) {
           <div id="site-menu" className="animate-[trac-menu_0.45s_ease] bg-white">
             <nav
               aria-label="Menu"
-              className="flex flex-col items-center gap-1 px-[8%] py-4 md:flex-row md:justify-center md:gap-12 md:py-3"
+              className="flex flex-col items-center gap-1 py-4 md:flex-row md:justify-center md:gap-12 md:py-3"
             >
               {site.navigation.map((link) => {
                 const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);

@@ -4,6 +4,8 @@ import { AdminFlash } from "@/components/admin-form";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
+export const instant = false;
+
 const sections = [
   {
     href: "/admin/contacto",

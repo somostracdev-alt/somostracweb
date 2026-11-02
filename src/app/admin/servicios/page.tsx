@@ -5,6 +5,8 @@ import { saveServicesAction } from "../actions";
 
 type SearchParams = Promise<{ error?: string; ok?: string }>;
 
+export const instant = false;
+
 export default async function AdminServicesPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const services = (await getSiteContent()).services;

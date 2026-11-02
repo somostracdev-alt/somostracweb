@@ -7,11 +7,13 @@ export const metadata: Metadata = {
   title: "Contacto",
 };
 
+export const instant = false;
+
 export default async function ContactPage() {
   const site = await getSiteContent();
 
   return (
-    <section className="px-5 py-16 md:px-[8%] md:py-24">
+    <section className="py-16 md:py-24">
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
           <h1 className="font-display text-[34px] leading-none">{site.contactPage.title}</h1>
