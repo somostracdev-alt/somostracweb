@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
-const DEGREES_PER_PIXEL = 0.22;
+const DEGREES_PER_PIXEL = 0.08;
 
 export function ScrollWheel({ src }: { src: string }) {
   const wheelRef = useRef<HTMLDivElement>(null);
@@ -19,7 +19,9 @@ export function ScrollWheel({ src }: { src: string }) {
 
     const update = () => {
       frame = 0;
-      wheel.style.transform = `rotate(${window.scrollY * DEGREES_PER_PIXEL}deg)`;
+      const box = wheel.parentElement?.getBoundingClientRect() ?? wheel.getBoundingClientRect();
+      const fromCenter = window.innerHeight / 2 - (box.top + box.height / 2);
+      wheel.style.transform = `rotate(${fromCenter * DEGREES_PER_PIXEL}deg)`;
     };
 
     const onScroll = () => {
@@ -29,8 +31,10 @@ export function ScrollWheel({ src }: { src: string }) {
 
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
@@ -42,6 +46,7 @@ export function ScrollWheel({ src }: { src: string }) {
           src={src}
           alt=""
           fill
+          unoptimized
           sizes="(min-width: 768px) 45vw, 100vw"
           className="object-contain"
         />

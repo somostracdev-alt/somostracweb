@@ -1,27 +1,24 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import type { ServiceItem } from "@/content/site";
 
+function indexLabel(index: number) {
+  return String(index + 1).padStart(2, "0");
+}
+
 export function ServiceGrid({ items }: { items: ServiceItem[] }) {
   return (
-    <div className="grid gap-x-16 gap-y-14 md:grid-cols-2">
-      {items.map((item) => (
-        <article key={item.id} className="group border-t border-line pt-7">
-          <Image
-            src={item.icon}
-            alt=""
-            width={96}
-            height={96}
-            className="mb-6 h-12 w-12 object-contain"
-          />
-          <h3 className="mb-4 font-sans text-base font-normal tracking-wide text-foreground transition-colors group-hover:text-accent md:text-lg">
-            {item.title}
+    <div className="grid gap-x-12 gap-y-12 md:grid-cols-2 lg:gap-x-16">
+      {items.map((item, index) => (
+        <article key={item.id} className="border-t border-line pt-7">
+          <p className="page-kicker">{indexLabel(index)}</p>
+          <h3 className="mb-4 font-sans text-base font-normal tracking-wide text-foreground md:text-lg">
+            <Link href={`/servicios#${item.id}`} className="transition-colors hover:text-accent">
+              {item.title}
+            </Link>
           </h3>
-          <div className="max-w-md space-y-3 text-sm font-light leading-7 text-muted">
-            {item.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
+          <p className="max-w-md text-sm font-light leading-7 text-muted">{item.paragraphs[0]}</p>
         </article>
       ))}
     </div>
@@ -30,14 +27,15 @@ export function ServiceGrid({ items }: { items: ServiceItem[] }) {
 
 export function ServiceBlocks({ items }: { items: ServiceItem[] }) {
   return (
-    <div className="space-y-16 md:space-y-24">
+    <div className="space-y-16 md:space-y-20">
       {items.map((item, index) => (
         <article
+          id={item.id}
           key={item.id}
-          className="grid items-center gap-8 border-t border-line pt-10 md:grid-cols-2 md:gap-16 md:pt-14"
+          className="grid scroll-mt-28 items-center gap-8 border-t border-line pt-10 md:grid-cols-2 md:gap-16 md:pt-12"
         >
           <div
-            className={`relative aspect-[16/9] overflow-hidden border border-line bg-surface ${index % 2 === 1 ? "md:order-2" : ""}`}
+            className={`relative aspect-[16/9] overflow-hidden bg-surface ${index % 2 === 1 ? "md:order-2" : ""}`}
           >
             {item.image ? (
               <Image
@@ -50,13 +48,7 @@ export function ServiceBlocks({ items }: { items: ServiceItem[] }) {
             ) : null}
           </div>
           <div>
-            <Image
-              src={item.icon}
-              alt=""
-              width={96}
-              height={96}
-              className="mb-6 h-12 w-12 object-contain"
-            />
+            <p className="page-kicker">{indexLabel(index)}</p>
             <h2 className="mb-5 font-sans text-xl font-normal tracking-wide text-foreground md:text-2xl">
               {item.title}
             </h2>

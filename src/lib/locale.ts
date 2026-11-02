@@ -23,6 +23,13 @@ export const uiCopy = {
     menuOpen: "Abrir menú",
     menuClose: "Cerrar menú",
     developedBy: "Desarrollado por",
+    problemKicker: "De dónde se pierde la venta",
+    processKicker: "El circuito",
+    offerKicker: "Cuatro bloques",
+    closeKicker: "Siguiente paso",
+    contactKicker: "Hablemos",
+    contactLead:
+      "Escribinos. Pedimos el rubro y cómo está armada la comercial, y seguimos por WhatsApp.",
   },
   en: {
     login: "Login",
@@ -43,6 +50,13 @@ export const uiCopy = {
     menuOpen: "Open menu",
     menuClose: "Close menu",
     developedBy: "Developed by",
+    problemKicker: "Where the sale gets lost",
+    processKicker: "The circuit",
+    offerKicker: "Four blocks",
+    closeKicker: "Next step",
+    contactKicker: "Let's talk",
+    contactLead:
+      "Write to us. We ask the line of business and how sales are set up, and we continue on WhatsApp.",
   },
 } as const;
 

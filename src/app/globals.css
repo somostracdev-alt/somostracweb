@@ -1,5 +1,5 @@
 @import "tailwindcss";
-/* theme tokens: dark default, light via data-theme — spacing v2 */
+/* theme tokens: dark default, light via data-theme — layout v3 */
 
 :root {
   color-scheme: dark;

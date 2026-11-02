@@ -51,21 +51,17 @@ export function SiteHeader({
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
-    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-[background-color,backdrop-filter] duration-300 ${
+      className={`sticky top-0 z-40 w-full transition-[background-color,backdrop-filter] duration-300 ${
         transparent ? "bg-[var(--header-scrolled)] backdrop-blur-md" : "bg-background"
       }`}
     >
-      <div className="grid grid-cols-3 items-center py-5 md:py-6">
+      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-3 items-center px-6 py-5 sm:px-10 md:py-6 lg:px-12">
         <SocialLinks links={site.social} />
         <Link href="/" className="justify-self-center" aria-label={site.brand.name}>
           <Image
@@ -111,11 +107,11 @@ export function SiteHeader({
       </div>
 
       {open ? (
-        <div className="overflow-hidden">
+        <div className="w-full overflow-hidden">
           <div id="site-menu" className="animate-[trac-menu_0.45s_ease] bg-foreground">
             <nav
               aria-label="Menu"
-              className="flex flex-col items-center gap-1 py-6 md:flex-row md:justify-center md:gap-14 md:py-4"
+              className="flex w-full flex-col items-center gap-1 py-6 md:flex-row md:justify-center md:gap-16 md:py-5"
             >
               {site.navigation.map((link) => {
                 const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
