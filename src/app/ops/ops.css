@@ -5,8 +5,50 @@
   font-weight: 400;
 }
 
-.ops-app a {
-  color: inherit;
+.ops-app a,
+.ops-app button,
+.ops-app select,
+.ops-app label {
+  cursor: pointer;
+}
+
+.ops-add {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6b726c;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ops-add-label {
+  position: absolute;
+  left: calc(100% + 0.2rem);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ops-add:hover .ops-add-label,
+.ops-add:focus-visible .ops-add-label {
+  opacity: 1;
+}
+
+.ops-add-end .ops-add-label {
+  left: auto;
+  right: calc(100% + 0.2rem);
 }
 
 .ops-chip {
@@ -43,4 +85,14 @@
 .ops-drawer {
   background: #f7f5f0;
   border-left: 1px solid #d5d8d1;
+}
+
+.ops-modal {
+  width: min(36rem, calc(100vw - 1.5rem));
+  max-height: min(90vh, 46rem);
+  overflow-y: auto;
+  border-radius: 1.4rem;
+  border: 1px solid #d5d8d1;
+  background: #f7f5f0;
+  box-shadow: 0 22px 60px rgba(42, 48, 44, 0.18);
 }

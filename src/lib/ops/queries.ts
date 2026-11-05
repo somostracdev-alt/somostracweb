@@ -1,5 +1,5 @@
 import { ensureOpsSchema } from "@/lib/ops/db";
-import type { LabelKind } from "@/lib/ops/labels";
+import { defaultLabels, type LabelKind } from "@/lib/ops/labels";
 
 export type OpsClient = {
   id: string;
@@ -72,6 +72,56 @@ export async function listOpsClients() {
 export async function getOpsClient(slug: string) {
   const clients = await listOpsClients();
   return clients.find((item) => item.slug === slug) ?? clients[0] ?? null;
+}
+
+function slugify(name: string) {
+  const slug = name
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+  return slug || "cliente";
+}
+
+export async function createOpsClient(name: string) {
+  const sql = await ensureOpsSchema();
+  if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Falta el nombre del cliente.");
+
+  let slug = slugify(trimmed);
+  const existing = await sql`SELECT slug FROM ops_clients WHERE slug = ${slug} OR slug LIKE ${`${slug}-%`}`;
+  const taken = new Set(existing.map((row) => String(row.slug)));
+  if (taken.has(slug)) {
+    let index = 2;
+    while (taken.has(`${slug}-${index}`)) index += 1;
+    slug = `${slug}-${index}`;
+  }
+
+  const created = await sql`
+    INSERT INTO ops_clients (slug, name) VALUES (${slug}, ${trimmed})
+    RETURNING id, slug, name
+  `;
+  const clientId = String(created[0].id);
+  const labels = [
+    { kind: "account" as const, name: trimmed, color: "#4f6f52", sort: 0 },
+    ...defaultLabels.filter((label) => label.kind !== "account"),
+  ];
+  for (const label of labels) {
+    await sql`
+      INSERT INTO ops_labels (client_id, kind, name, color, sort)
+      VALUES (${clientId}, ${label.kind}, ${label.name}, ${label.color}, ${label.sort})
+      ON CONFLICT (client_id, kind, name) DO NOTHING
+    `;
+  }
+
+  return {
+    id: clientId,
+    slug: String(created[0].slug),
+    name: String(created[0].name),
+  } as OpsClient;
 }
 
 export async function listOpsLabels(clientId: string) {

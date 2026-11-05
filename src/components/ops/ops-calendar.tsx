@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { deleteOpsPieceAction, saveOpsPieceAction } from "@/app/ops/actions";
+import { createOpsClientAction, deleteOpsPieceAction, saveOpsPieceAction } from "@/app/ops/actions";
 import { labelTone } from "@/lib/ops/labels";
 import type { OpsClient, OpsLabelRow, OpsPiece } from "@/lib/ops/queries";
 
@@ -35,6 +35,17 @@ function addDays(iso: string, amount: number) {
 
 function mondayIndex(date: Date) {
   return (date.getDay() + 6) % 7;
+}
+
+function formatDate(iso: string) {
+  const date = new Date(`${iso}T12:00:00`);
+  return `${weekdayNames[mondayIndex(date)]} ${date.getDate()} de ${monthNames[date.getMonth()]}`;
+}
+
+function confirmDelete(event: { preventDefault: () => void }) {
+  if (!window.confirm("¿Eliminar esta pieza? Esta acción no se puede deshacer.")) {
+    event.preventDefault();
+  }
 }
 
 function labelsOf(labels: OpsLabelRow[], kind: OpsLabelRow["kind"]) {
@@ -81,7 +92,9 @@ export function OpsCalendar({
 }) {
   const router = useRouter();
   const [filter, setFilter] = useState("");
+  const [viewing, setViewing] = useState<OpsPiece | null>(null);
   const [open, setOpen] = useState<OpsPiece | null>(null);
+  const [addingClient, setAddingClient] = useState(false);
   const year = Number(month.slice(0, 4));
   const monthNumber = Number(month.slice(5, 7));
   const first = new Date(year, monthNumber - 1, 1);
@@ -130,7 +143,10 @@ export function OpsCalendar({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <label className="grid text-xs text-[#5c6560]">
-            Cliente
+            <span className="flex items-center gap-1">
+              Cliente
+              <AddPlus onClick={() => setAddingClient(true)} />
+            </span>
             <select
               value={client.slug}
               onChange={(event) => router.push(href(month, event.target.value))}
@@ -199,7 +215,7 @@ export function OpsCalendar({
               <button
                 key={piece.id}
                 type="button"
-                onClick={() => setOpen(piece)}
+                onClick={() => setViewing(piece)}
                 className="rounded-xl border border-[#d5d8d1] bg-[#f7f5f0] px-3 py-2 text-left"
               >
                 <p className="text-xs text-[#5c6560]">
@@ -237,17 +253,14 @@ export function OpsCalendar({
             <div key={date} className="ops-day">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-semibold">{day}</p>
-                <button
-                  type="button"
+                <AddPlus
+                  end
                   onClick={() => setOpen(emptyPiece(date, labelsOf(labels, "account")[0]?.name ?? ""))}
-                  className="text-xs text-[#6b726c]"
-                >
-                  +
-                </button>
+                />
               </div>
               <div className="space-y-1">
                 {items.map((piece) => (
-                  <button key={piece.id} type="button" onClick={() => setOpen(piece)} className="block w-full text-left">
+                  <button key={piece.id} type="button" onClick={() => setViewing(piece)} className="block w-full text-left">
                     <PieceChip piece={piece} labels={labels} />
                   </button>
                 ))}
@@ -257,6 +270,26 @@ export function OpsCalendar({
         })}
       </div>
 
+      {addingClient ? (
+        <ClientForm
+          month={month}
+          clientSlug={client.slug}
+          onClose={() => setAddingClient(false)}
+        />
+      ) : null}
+      {viewing ? (
+        <PiecePeek
+          piece={viewing}
+          client={client}
+          month={month}
+          labels={labels}
+          onClose={() => setViewing(null)}
+          onEdit={() => {
+            setOpen(viewing);
+            setViewing(null);
+          }}
+        />
+      ) : null}
       {open ? (
         <PieceDrawer
           piece={open}
@@ -266,6 +299,52 @@ export function OpsCalendar({
           onClose={() => setOpen(null)}
         />
       ) : null}
+    </div>
+  );
+}
+
+function AddPlus({ onClick, end = false }: { onClick: () => void; end?: boolean }) {
+  return (
+    <button type="button" className={`ops-add${end ? " ops-add-end" : ""}`} onClick={onClick} aria-label="Nueva">
+      +<span className="ops-add-label">nueva</span>
+    </button>
+  );
+}
+
+function ClientForm({
+  month,
+  clientSlug,
+  onClose,
+}: {
+  month: string;
+  clientSlug: string;
+  onClose: () => void;
+}) {
+  const field = "w-full rounded-xl border border-[#cfd4cc] bg-white/70 px-3 py-2 text-sm text-[#2a302c]";
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a302c]/30 px-3" onClick={onClose}>
+      <div className="ops-modal p-6" onClick={(event) => event.stopPropagation()}>
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b726c]">Sala de clientes</p>
+            <h2 className="mt-1 text-2xl font-semibold">Nuevo cliente</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full px-3 py-1 text-sm">
+            Cerrar
+          </button>
+        </div>
+        <form action={createOpsClientAction} className="grid gap-3">
+          <input type="hidden" name="month" value={month} />
+          <input type="hidden" name="clientSlug" value={clientSlug} />
+          <label className="grid gap-1 text-xs">
+            Nombre
+            <input name="name" required autoFocus className={field} placeholder="Ej. Gallagro" />
+          </label>
+          <button type="submit" className="mt-2 w-fit rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
+            Crear
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -280,6 +359,92 @@ function PieceChip({ piece, labels }: { piece: OpsPiece; labels: OpsLabelRow[] }
         {piece.theme ? ` · ${piece.theme}` : ""}
       </span>
     </span>
+  );
+}
+
+function DetailLine({ label, value }: { label: string; value: string }) {
+  if (!value.trim()) return null;
+  return (
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6b726c]">{label}</p>
+      <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-[#2a302c]">{value}</p>
+    </div>
+  );
+}
+
+function Tag({ labels, kind, name }: { labels: OpsLabelRow[]; kind: OpsLabelRow["kind"]; name: string }) {
+  if (!name) return null;
+  const color = colorFor(labels, kind, name);
+  return (
+    <span className="ops-chip" style={labelTone(color)}>
+      <span className="ops-chip-dot" style={{ background: color }} />
+      {name}
+    </span>
+  );
+}
+
+function PiecePeek({
+  piece,
+  client,
+  month,
+  labels,
+  onClose,
+  onEdit,
+}: {
+  piece: OpsPiece;
+  client: OpsClient;
+  month: string;
+  labels: OpsLabelRow[];
+  onClose: () => void;
+  onEdit: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a302c]/30 px-3" onClick={onClose}>
+      <div className="ops-modal p-6" onClick={(event) => event.stopPropagation()}>
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b726c]">
+              {formatDate(piece.publishOn)}
+              {piece.timeLabel ? ` · ${piece.timeLabel}` : ""}
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold">{piece.theme || "Sin tema todavía"}</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full px-3 py-1 text-sm">
+            Cerrar
+          </button>
+        </div>
+        <div className="mb-5 flex flex-wrap gap-1.5">
+          <Tag labels={labels} kind="account" name={piece.account} />
+          <Tag labels={labels} kind="format" name={piece.format} />
+          <Tag labels={labels} kind="pillar" name={piece.pillar} />
+          <Tag labels={labels} kind="status" name={piece.status} />
+        </div>
+        <div className="grid gap-4">
+          <DetailLine label="Material crudo" value={piece.material} />
+          <DetailLine label="Copy" value={piece.copy} />
+          <DetailLine label="Brief de diseño" value={piece.brief} />
+          <DetailLine label="CTA" value={piece.cta} />
+          <DetailLine label="A cargo" value={piece.owner} />
+        </div>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]"
+          >
+            Editar
+          </button>
+          <form action={deleteOpsPieceAction} onSubmit={confirmDelete}>
+            <input type="hidden" name="id" value={piece.id} />
+            <input type="hidden" name="clientSlug" value={client.slug} />
+            <input type="hidden" name="month" value={month} />
+            <button type="submit" className="rounded-full px-4 py-2 text-sm text-[#a45b5b]">
+              Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -364,6 +529,7 @@ function PieceDrawer({
               <button
                 type="submit"
                 formAction={deleteOpsPieceAction}
+                onClick={confirmDelete}
                 className="rounded-full px-4 py-2 text-sm text-[#a45b5b]"
               >
                 Borrar

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { isAdminAuthenticated } from "@/lib/admin-session";
-import { createOpsPiece, deleteOpsPiece, updateOpsPiece } from "@/lib/ops/queries";
+import { createOpsClient, createOpsPiece, deleteOpsPiece, updateOpsPiece } from "@/lib/ops/queries";
 
 function text(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
@@ -37,6 +37,26 @@ async function guard() {
   if (!(await isAdminAuthenticated())) {
     redirect("/login?next=/ops");
   }
+}
+
+export async function createOpsClientAction(formData: FormData) {
+  await guard();
+  const name = text(formData, "name");
+  const month = text(formData, "month");
+  const fallback = text(formData, "clientSlug") || "gallagro";
+  const back = month ? `/ops?client=${encodeURIComponent(fallback)}&month=${encodeURIComponent(month)}` : `/ops?client=${encodeURIComponent(fallback)}`;
+  let created;
+  try {
+    created = await createOpsClient(name);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo crear el cliente.";
+    redirect(`${back}&error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath("/ops");
+  const next = month
+    ? `/ops?client=${encodeURIComponent(created.slug)}&month=${encodeURIComponent(month)}`
+    : `/ops?client=${encodeURIComponent(created.slug)}`;
+  redirect(`${next}&ok=${encodeURIComponent("Cliente creado.")}`);
 }
 
 export async function saveOpsPieceAction(formData: FormData) {
