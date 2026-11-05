@@ -87,6 +87,24 @@
   border-left: 1px solid #d5d8d1;
 }
 
+.ops-month-summary > summary {
+  list-style: none;
+}
+
+.ops-month-summary > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ops-month-summary[open] .ops-month-chevron {
+  transform: rotate(180deg);
+}
+
+.ops-month-rule {
+  flex: 1;
+  min-width: 0.75rem;
+  border-bottom: 1px dotted #b7bdb6;
+}
+
 .ops-modal {
   width: min(36rem, calc(100vw - 1.5rem));
   max-height: min(90vh, 46rem);

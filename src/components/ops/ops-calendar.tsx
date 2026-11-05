@@ -241,22 +241,23 @@ export function OpsCalendar({
         </div>
       </section>
 
-      <section className="mb-5 rounded-2xl bg-[#f3f1eb] p-4">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold">Cómo quedó el mes</h2>
-            <p className="mt-1 text-xs text-[#6b726c]">Se completa solo con las piezas de {monthNames[monthNumber - 1].toLowerCase()}.</p>
-          </div>
-          <p className="text-sm text-[#5c6560]">
-            Piezas cargadas <span className="ml-2 text-2xl font-semibold text-[#2a302c]">{monthPieces.length}</span>
-          </p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
+      <details className="ops-month-summary mb-5 rounded-2xl bg-[#f3f1eb]">
+        <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3">
+          <span className="text-sm font-semibold">Cómo quedó el mes</span>
+          <span className="flex items-center gap-3 text-sm text-[#5c6560]">
+            Piezas cargadas
+            <span className="text-xl font-semibold text-[#2a302c]">{monthPieces.length}</span>
+            <svg className="ops-month-chevron h-4 w-4 text-[#6b726c] transition-transform" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M5.3 7.3a1 1 0 0 1 1.4 0L10 10.58l3.3-3.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.42Z" />
+            </svg>
+          </span>
+        </summary>
+        <div className="grid gap-0 border-t border-[#e0e3dc] px-4 py-3 md:grid-cols-3 md:divide-x md:divide-dashed md:divide-[#cfd4cc]">
           <MonthTally title="Por pilar" rows={monthTallies.pillar} />
           <MonthTally title="Por formato" rows={monthTallies.format} />
           <MonthTally title="Por estado" rows={monthTallies.status} />
         </div>
-      </section>
+      </details>
 
       <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-[#6b726c]">
         {weekdayNames.map((name) => (
@@ -330,15 +331,16 @@ function MonthTally({
   rows: { id: string; name: string; color: string; count: number }[];
 }) {
   return (
-    <div>
+    <div className="border-b border-dashed border-[#cfd4cc] py-3 last:border-b-0 md:border-b-0 md:px-4 md:py-0 md:first:pl-0 md:last:pr-0">
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6b726c]">{title}</p>
       <ul className="space-y-1">
         {rows.map((row) => (
-          <li key={row.id} className="flex items-center justify-between gap-3 text-sm">
-            <span className="ops-chip" style={labelTone(row.color)}>
+          <li key={row.id} className="flex items-center gap-2 text-sm">
+            <span className="ops-chip shrink-0" style={labelTone(row.color)}>
               <span className="ops-chip-dot" style={{ background: row.color }} />
               {row.name}
             </span>
+            <span className="ops-month-rule" />
             <span className="font-semibold tabular-nums text-[#2a302c]">{row.count}</span>
           </li>
         ))}
