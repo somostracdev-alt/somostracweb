@@ -36,7 +36,7 @@ export default async function OpsPage({ searchParams }: { searchParams: SearchPa
   if (!databaseUrl()) {
     return (
       <div className="mx-auto max-w-xl px-6 py-16">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Sala de clientes</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Calendario</p>
         <h1 className="mt-2 text-3xl font-semibold">Falta Neon</h1>
         <p className="mt-4 text-sm leading-7 text-[#5c6560]">
           Pegá la connection string en <code>DATABASE_URL</code> (en <code>.env.local</code> y en Vercel). El
@@ -72,7 +72,7 @@ export default async function OpsPage({ searchParams }: { searchParams: SearchPa
     const parsed = describeDatabaseUrl(databaseUrl());
     return (
       <div className="mx-auto max-w-xl px-6 py-16">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Sala de clientes</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Calendario</p>
         <h1 className="mt-2 text-3xl font-semibold">No se pudo cargar el calendario</h1>
         <p className="mt-4 text-sm leading-7 text-[#5c6560]">{message}</p>
         <p className="mt-4 text-sm leading-7 text-[#5c6560]">

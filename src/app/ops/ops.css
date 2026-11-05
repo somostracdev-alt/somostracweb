@@ -1,5 +1,7 @@
 .ops-app {
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
   background: #e4e7e1;
   color: #2a302c;
   font-weight: 400;
@@ -54,8 +56,10 @@
 .ops-chip {
   display: inline-flex;
   max-width: 100%;
+  min-width: 0;
   align-items: center;
   gap: 0.4rem;
+  overflow: hidden;
   border-radius: 999px;
   border: 1px solid transparent;
   padding: 0.15rem 0.5rem;
@@ -75,6 +79,34 @@
   border-radius: 1rem;
   background: #f3f1eb;
   padding: 0.65rem;
+}
+
+.ops-mday {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  background: #f3f1eb;
+  padding: 0.5rem 0 0.45rem;
+}
+
+.ops-mday-today {
+  border-color: #4f6f52;
+}
+
+.ops-mday-selected {
+  background: #2a302c;
+  color: #f7f5f0;
+}
+
+.ops-scroll-x {
+  scrollbar-width: none;
+}
+
+.ops-scroll-x::-webkit-scrollbar {
+  display: none;
 }
 
 .ops-day-muted {

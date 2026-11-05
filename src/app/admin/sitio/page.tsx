@@ -14,9 +14,9 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Se
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold">Menú y pie</h1>
+        <h1 className="text-3xl font-semibold">Menú y footer</h1>
         <p className="mt-2 max-w-3xl text-black/70">
-          Los enlaces del menú y del pie siguen yendo a las mismas páginas. Acá se cambia el texto y el logo.
+          Los enlaces del menú y del footer siguen yendo a las mismas páginas. Acá se cambia el texto y el logo.
         </p>
       </div>
       <AdminFlash ok={params.ok} error={params.error} />
@@ -30,7 +30,7 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Se
             <Field key={link.id} label={link.href} name={`nav-${link.id}`} defaultValue={link.label} />
           ))}
         </AdminCard>
-        <AdminCard title="Pie">
+        <AdminCard title="Footer">
           <Field label="Tagline" name="tagline" defaultValue={site.footer.tagline} />
           <Field label="Título de links" name="linksTitle" defaultValue={site.footer.linksTitle} />
           <Field label="Título de contacto" name="contactTitle" defaultValue={site.footer.contactTitle} />

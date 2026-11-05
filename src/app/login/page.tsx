@@ -1,9 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { loginAdminAction } from "./actions";
 import { isAdminAuthenticated } from "@/lib/admin-session";
 import { safeNext } from "@/lib/ops/safe-next";
+import { getSiteContent } from "@/lib/site-store";
 
 type SearchParams = Promise<{ error?: string; aviso?: string; next?: string }>;
 
@@ -19,25 +21,42 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
   if (await isAdminAuthenticated()) {
     redirect(next || "/admin");
   }
+  const site = await getSiteContent();
+  const field =
+    "mt-1 w-full border-0 border-b border-line bg-transparent px-0 py-2.5 text-foreground outline-none focus:border-accent";
 
   return (
-    <div className="min-h-screen bg-white text-[#383838]">
-      <div className="mx-auto w-full max-w-md px-6 py-10">
-        <div className="mb-8 space-y-3">
-          <h1 className="text-4xl font-semibold">Iniciar sesión</h1>
-          <p className="text-black/70">Entrá con el usuario admin y la contraseña del panel.</p>
-        </div>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
+        <Link href="/" className="mb-10 self-center" aria-label={site.brand.name}>
+          <Image
+            src={site.brand.logo}
+            alt={site.brand.name}
+            width={482}
+            height={128}
+            priority
+            className="brand-logo h-10 w-auto"
+          />
+        </Link>
+
+        <p className="page-kicker">Acceso</p>
+        <h1 className="page-heading">Iniciar sesión</h1>
+        <p className="mt-4 text-sm font-light leading-7 text-muted">
+          Entrá con el usuario admin y la contraseña del panel.
+        </p>
 
         {params.aviso ? (
-          <p className="mb-4 rounded-xl bg-amber-100 px-4 py-2 text-sm text-amber-950">{params.aviso}</p>
+          <p className="mt-6 border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-foreground">{params.aviso}</p>
         ) : null}
         {params.error ? (
-          <p className="mb-4 rounded-xl bg-red-100 px-4 py-2 text-sm text-red-950">{params.error}</p>
+          <p className="mt-6 border border-[#a45b5b]/50 bg-[#a45b5b]/10 px-4 py-3 text-sm text-foreground">
+            {params.error}
+          </p>
         ) : null}
 
-        <form action={loginAdminAction} className="space-y-4 rounded-2xl border border-black/10 p-6">
+        <form action={loginAdminAction} className="mt-8 space-y-6 border border-line bg-surface p-6">
           {next ? <input type="hidden" name="next" value={next} /> : null}
-          <label className="grid gap-1 text-sm">
+          <label className="grid text-xs font-semibold uppercase tracking-[0.16em] text-muted">
             Usuario
             <input
               name="email"
@@ -45,29 +64,23 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
               required
               autoComplete="username"
               defaultValue="admin"
-              className="rounded-xl border border-black/20 px-4 py-2"
+              className={field}
             />
           </label>
-          <label className="grid gap-1 text-sm">
+          <label className="grid text-xs font-semibold uppercase tracking-[0.16em] text-muted">
             Contraseña
-            <input
-              name="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="rounded-xl border border-black/20 px-4 py-2"
-            />
+            <input name="password" type="password" required autoComplete="current-password" className={field} />
           </label>
           <button
             type="submit"
-            className="w-full rounded-full bg-black px-5 py-2 text-sm uppercase tracking-wide text-white"
+            className="w-full bg-accent px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-black transition-colors hover:bg-foreground hover:text-background"
           >
             Entrar
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm">
-          <Link href="/" className="underline">
+        <p className="mt-8 text-center text-sm">
+          <Link href="/" className="text-muted transition-colors hover:text-accent">
             Volver al sitio
           </Link>
         </p>

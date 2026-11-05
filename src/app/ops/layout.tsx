@@ -8,7 +8,7 @@ import "./ops.css";
 export const instant = false;
 
 export const metadata = {
-  title: "Sala de clientes",
+  title: "Calendario",
 };
 
 export default async function OpsLayout({ children }: { children: React.ReactNode }) {

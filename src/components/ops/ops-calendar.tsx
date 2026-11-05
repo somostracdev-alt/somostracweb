@@ -95,6 +95,7 @@ export function OpsCalendar({
   const [viewing, setViewing] = useState<OpsPiece | null>(null);
   const [open, setOpen] = useState<OpsPiece | null>(null);
   const [addingClient, setAddingClient] = useState(false);
+  const [picked, setPicked] = useState<string | null>(null);
   const year = Number(month.slice(0, 4));
   const monthNumber = Number(month.slice(5, 7));
   const first = new Date(year, monthNumber - 1, 1);
@@ -130,6 +131,12 @@ export function OpsCalendar({
     `/ops?client=${encodeURIComponent(nextClient)}&month=${encodeURIComponent(nextMonth)}`;
 
   const monthPieces = pieces.filter((piece) => piece.publishOn.startsWith(month));
+  const defaultDay = today.startsWith(month)
+    ? today
+    : (monthPieces[0]?.publishOn ?? `${month}-01`);
+  const selectedDay = picked && picked.startsWith(month) ? picked : defaultDay;
+  const selectedItems = byDay.get(selectedDay) ?? [];
+  const firstAccount = labelsOf(labels, "account")[0]?.name ?? "";
   const monthTallies = {
     pillar: labelsOf(labels, "pillar").map((item) => ({
       ...item,
@@ -146,13 +153,13 @@ export function OpsCalendar({
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-4 py-5 sm:px-6">
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto flex min-h-screen w-full min-w-0 max-w-[1500px] flex-col px-4 py-5 sm:px-6">
+      <header className="mb-5 grid gap-4 md:flex md:flex-wrap md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Sala de clientes</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">TRAC · Planificación</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">Calendario</h1>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
           <label className="grid text-xs text-[#5c6560]">
             <span className="flex items-center gap-1">
               Cliente
@@ -161,7 +168,7 @@ export function OpsCalendar({
             <select
               value={client.slug}
               onChange={(event) => router.push(href(month, event.target.value))}
-              className="mt-1 rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm sm:w-auto"
             >
               {clients.map((item) => (
                 <option key={item.id} value={item.slug}>
@@ -170,19 +177,31 @@ export function OpsCalendar({
               ))}
             </select>
           </label>
-          <a href={href(previous)} className="rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm">
-            Mes anterior
-          </a>
-          <p className="min-w-40 px-2 text-center text-lg font-semibold">
-            {monthNames[monthNumber - 1]} {year}
-          </p>
-          <a href={href(next)} className="rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm">
-            Mes siguiente
-          </a>
+          <div className="flex items-center justify-between gap-2 sm:contents">
+            <a
+              href={href(previous)}
+              aria-label="Mes anterior"
+              className="rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-4 py-2 text-sm"
+            >
+              <span className="sm:hidden">‹</span>
+              <span className="hidden sm:inline">Mes anterior</span>
+            </a>
+            <p className="text-center text-lg font-semibold sm:min-w-40 sm:px-2">
+              {monthNames[monthNumber - 1]} {year}
+            </p>
+            <a
+              href={href(next)}
+              aria-label="Mes siguiente"
+              className="rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-4 py-2 text-sm"
+            >
+              <span className="sm:hidden">›</span>
+              <span className="hidden sm:inline">Mes siguiente</span>
+            </a>
+          </div>
           <button
             type="button"
-            onClick={() => setOpen(emptyPiece(`${month}-01`, labelsOf(labels, "account")[0]?.name ?? ""))}
-            className="rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]"
+            onClick={() => setOpen(emptyPiece(`${month}-01`, firstAccount))}
+            className="rounded-full bg-[#4f6f52] px-4 py-2.5 text-sm text-[#f7f5f0] sm:py-2"
           >
             Nueva pieza
           </button>
@@ -195,11 +214,11 @@ export function OpsCalendar({
       <section className="mb-5 rounded-2xl bg-[#f3f1eb] p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold">Próximos 14 días</h2>
-          <div className="flex flex-wrap gap-1">
+          <div className="ops-scroll-x flex max-w-full gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
             <button
               type="button"
               onClick={() => setFilter("")}
-              className={`rounded-full px-3 py-1 text-xs ${filter ? "bg-transparent text-[#5c6560]" : "bg-[#2a302c] text-[#f3f1eb]"}`}
+              className={`shrink-0 rounded-full px-3 py-1 text-xs ${filter ? "bg-transparent text-[#5c6560]" : "bg-[#2a302c] text-[#f3f1eb]"}`}
             >
               Todas
             </button>
@@ -208,7 +227,7 @@ export function OpsCalendar({
                 key={status.id}
                 type="button"
                 onClick={() => setFilter(status.name)}
-                className="rounded-full px-3 py-1 text-xs"
+                className="shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs"
                 style={
                   filter === status.name
                     ? { background: status.color, color: "#f7f5f0" }
@@ -220,14 +239,14 @@ export function OpsCalendar({
             ))}
           </div>
         </div>
-        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid min-w-0 gap-2 md:grid-cols-2 xl:grid-cols-3">
           {upcoming.length ? (
             upcoming.map((piece) => (
               <button
                 key={piece.id}
                 type="button"
                 onClick={() => setViewing(piece)}
-                className="rounded-xl border border-[#d5d8d1] bg-[#f7f5f0] px-3 py-2 text-left"
+                className="min-w-0 overflow-hidden rounded-xl border border-[#d5d8d1] bg-[#f7f5f0] px-3 py-2 text-left"
               >
                 <p className="text-xs text-[#5c6560]">
                   {piece.publishOn.slice(8, 10)}/{piece.publishOn.slice(5, 7)} · {piece.account}
@@ -242,9 +261,9 @@ export function OpsCalendar({
       </section>
 
       <details className="ops-month-summary mb-5 rounded-2xl bg-[#f3f1eb]">
-        <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3">
+        <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3">
           <span className="text-sm font-semibold">Cómo quedó el mes</span>
-          <span className="flex items-center gap-3 text-sm text-[#5c6560]">
+          <span className="flex items-center gap-2 text-sm text-[#5c6560]">
             Piezas cargadas
             <span className="text-xl font-semibold text-[#2a302c]">{monthPieces.length}</span>
             <svg className="ops-month-chevron h-4 w-4 text-[#6b726c] transition-transform" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -259,36 +278,106 @@ export function OpsCalendar({
         </div>
       </details>
 
-      <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-[#6b726c]">
-        {weekdayNames.map((name) => (
-          <p key={name}>{name}</p>
-        ))}
+      <div className="hidden md:block">
+        <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-[#6b726c]">
+          {weekdayNames.map((name) => (
+            <p key={name}>{name}</p>
+          ))}
+        </div>
+        <div className="mt-2 grid grid-cols-7 gap-2">
+          {cells.map((day, index) => {
+            if (!day) return <div key={`empty-${index}`} className="ops-day ops-day-muted" />;
+            const date = isoDate(year, monthNumber, day);
+            const items = byDay.get(date) ?? [];
+            return (
+              <div key={date} className="ops-day">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-semibold">{day}</p>
+                  <AddPlus end onClick={() => setOpen(emptyPiece(date, firstAccount))} />
+                </div>
+                <div className="space-y-1">
+                  {items.map((piece) => (
+                    <button key={piece.id} type="button" onClick={() => setViewing(piece)} className="block w-full text-left">
+                      <PieceChip piece={piece} labels={labels} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div className="mt-2 grid grid-cols-7 gap-2">
-        {cells.map((day, index) => {
-          if (!day) return <div key={`empty-${index}`} className="ops-day ops-day-muted" />;
-          const date = isoDate(year, monthNumber, day);
-          const items = byDay.get(date) ?? [];
-          return (
-            <div key={date} className="ops-day">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-sm font-semibold">{day}</p>
-                <AddPlus
-                  end
-                  onClick={() => setOpen(emptyPiece(date, labelsOf(labels, "account")[0]?.name ?? ""))}
-                />
-              </div>
-              <div className="space-y-1">
-                {items.map((piece) => (
-                  <button key={piece.id} type="button" onClick={() => setViewing(piece)} className="block w-full text-left">
-                    <PieceChip piece={piece} labels={labels} />
-                  </button>
-                ))}
-              </div>
+
+      <section className="md:hidden">
+        <div className="grid grid-cols-7 text-center text-[11px] font-semibold uppercase text-[#6b726c]">
+          {weekdayNames.map((name) => (
+            <p key={name}>{name.slice(0, 2)}</p>
+          ))}
+        </div>
+        <div className="mt-2 grid grid-cols-7 gap-1">
+          {cells.map((day, index) => {
+            if (!day) return <div key={`m-empty-${index}`} />;
+            const date = isoDate(year, monthNumber, day);
+            const items = byDay.get(date) ?? [];
+            const classes = ["ops-mday"];
+            if (date === today) classes.push("ops-mday-today");
+            if (date === selectedDay) classes.push("ops-mday-selected");
+            return (
+              <button
+                key={`m-${date}`}
+                type="button"
+                onClick={() => setPicked(date)}
+                aria-pressed={date === selectedDay}
+                aria-label={`${formatDate(date)}, ${items.length} piezas`}
+                className={classes.join(" ")}
+              >
+                <span className="text-sm font-semibold">{day}</span>
+                <span className="flex h-1.5 items-center justify-center gap-0.5">
+                  {items.slice(0, 3).map((piece) => (
+                    <span
+                      key={piece.id}
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ background: colorFor(labels, "pillar", piece.pillar) }}
+                    />
+                  ))}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 rounded-2xl bg-[#f3f1eb] p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold first-letter:uppercase">{formatDate(selectedDay)}</h2>
+            <button
+              type="button"
+              onClick={() => setOpen(emptyPiece(selectedDay, firstAccount))}
+              className="shrink-0 rounded-full border border-[#cfd4cc] px-3 py-1.5 text-xs"
+            >
+              + Nueva
+            </button>
+          </div>
+          {selectedItems.length ? (
+            <div className="grid min-w-0 gap-2">
+              {selectedItems.map((piece) => (
+                <button
+                  key={piece.id}
+                  type="button"
+                  onClick={() => setViewing(piece)}
+                  className="min-w-0 overflow-hidden rounded-xl border border-[#d5d8d1] bg-[#f7f5f0] px-3 py-2.5 text-left"
+                >
+                  <p className="mb-1 text-xs text-[#5c6560]">
+                    {[piece.timeLabel, piece.account, piece.status].filter(Boolean).join(" · ")}
+                  </p>
+                  <PieceChip piece={piece} labels={labels} />
+                </button>
+              ))}
             </div>
-          );
-        })}
-      </div>
+          ) : (
+            <p className="text-sm text-[#5c6560]">No hay piezas este día.</p>
+          )}
+        </div>
+      </section>
 
       {addingClient ? (
         <ClientForm
@@ -372,7 +461,7 @@ function ClientForm({
       <div className="ops-modal p-6" onClick={(event) => event.stopPropagation()}>
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b726c]">Sala de clientes</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b726c]">Calendario</p>
             <h2 className="mt-1 text-2xl font-semibold">Nuevo cliente</h2>
           </div>
           <button type="button" onClick={onClose} className="rounded-full px-3 py-1 text-sm">
@@ -400,7 +489,7 @@ function PieceChip({ piece, labels }: { piece: OpsPiece; labels: OpsLabelRow[] }
   return (
     <span className="ops-chip w-full" style={labelTone(color)}>
       <span className="ops-chip-dot" style={{ background: color }} />
-      <span className="truncate">
+      <span className="min-w-0 flex-1 truncate">
         {piece.format || "Pieza"}
         {piece.theme ? ` · ${piece.theme}` : ""}
       </span>
