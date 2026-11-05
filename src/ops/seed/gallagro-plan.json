@@ -1,0 +1,701 @@
+{
+  "name": "Noviembre y diciembre 2026",
+  "platform": "Meta Ads",
+  "accountRef": "972807331813501",
+  "destination": "WhatsApp",
+  "channels": "Facebook e Instagram",
+  "months": [
+    {
+      "month": "2026-11-01",
+      "cap": 500000
+    },
+    {
+      "month": "2026-12-01",
+      "cap": 500000
+    }
+  ],
+  "how": [
+    "4 campañas: Cosechadoras, Tractores, Sembradoras y Repuestos. Un conjunto Always on (AO) por campaña; Repuestos suma un Especial por mes.",
+    "Maquinaria (Colombo, Chery, Sembradoras): 4 anuncios por conjunto = 1 de precio + 1 por banco (Credicoop, Bancor, Santander). Probamos qué banco trae más consultas.",
+    "Sembradoras queda APAGADA: se optimiza y se deja lista, pero se prende recién cuando se defina. Su plata queda como reserva (columna Margen).",
+    "Objetivo: Interacción → Mensajes → WhatsApp, optimizado por conversaciones. No usar Clientes potenciales (en Repuestos nos costó $4.600 por conversación).",
+    "Presupuesto por conjunto. Mejoras Advantage+ apagadas.",
+    "Cada anuncio con su mensaje precargado propio (pestaña Anuncios), así Fede y Mati saben de qué anuncio y qué banco viene cada consulta.",
+    "Públicos: en cada conjunto va la zona y a quién le hablamos. Las audiencias las arma quien carga la cuenta.",
+    "Montos netos de impuestos. $/mes = $/día × días del mes. Los números azules se pueden cambiar y todo se recalcula."
+  ],
+  "pending": [
+    "Bancos: confirmar que cada línea aplica al equipo y al precio publicado, vigencia, TEA, CFT y gastos para el legal de cada anuncio. La TNA no es el costo total.",
+    "Credicoop tiene una comisión del 10% a cargo del proveedor: confirmar cómo se combina con el precio de Colombo y con la preventa.",
+    "Si Meta pide categoría especial por los anuncios de financiación, declararla (aplica a toda la campaña y limita la segmentación).",
+    "Preventa Colombo: confirmar fecha límite de pago (¿30/11?) y que los descuentos de 10% y 5% son sucesivos (14,5% efectivo = USD 196.650).",
+    "Colombo: confirmar si es Twin Master o Twin Master S, y qué precio va en el anuncio de diciembre (lista o crédito sin subsidio).",
+    "Sembradoras: definir qué se comunica para prenderla. Reserva: $3.000/día.",
+    "Fecha del Aniversario Gallagro (noviembre).",
+    "Timing: los creativos de noviembre (sobre todo Colombo) tienen que estar para el 1/11."
+  ],
+  "campaigns": [
+    {
+      "name": "PROS_Cosechadoras_Colombo",
+      "label": "Cosechadoras Colombo",
+      "audience": {
+        "zone": "Córdoba, San Luis y La Pampa.",
+        "who": "Productores y contratistas de maní. La especialización en maní tiene que verse en el primer segundo del anuncio.",
+        "exclude": "Clientes y contactos en negociación."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "AO_Colombo",
+          "kind": "always_on",
+          "windowLabel": "1/11 – 30/11",
+          "message": "Preventa Twin Master (pago antes de diciembre) + financiación por banco. Foco campaña de maní.",
+          "adsLabel": "4: Precio · Credicoop · Bancor · Santander",
+          "brands": "Colombo",
+          "zoneNote": "Provincias: Córdoba, San Luis y La Pampa. Productores y contratistas de maní. Excluir clientes y contactos en negociación.",
+          "whatsapp": "Fede (maquinaria)",
+          "dailyBudget": 5000,
+          "days": 30,
+          "ads": [
+            {
+              "name": "Precio_Preventa",
+              "angle": "Precio",
+              "body": "PREVENTA COLOMBO TWIN MASTER · USD 196.650 + IVA por pago antes de diciembre · sin entrega de usado.",
+              "prefilled": "Hola, quiero info de la preventa Colombo"
+            },
+            {
+              "name": "Banco_Credicoop",
+              "angle": "Financiación Credicoop",
+              "body": "Colombo Twin Master · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar la Colombo con Credicoop"
+            },
+            {
+              "name": "Banco_Bancor",
+              "angle": "Financiación Bancor",
+              "body": "Colombo Twin Master · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar la Colombo con Bancor"
+            },
+            {
+              "name": "Banco_Santander",
+              "angle": "Financiación Santander",
+              "body": "Colombo Twin Master · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar la Colombo con Santander"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "AO_Colombo",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Cerrada la preventa: precio + financiación por banco para llegar a la campaña de maní.",
+          "adsLabel": "4: Precio · Credicoop · Bancor · Santander",
+          "brands": "Colombo",
+          "zoneNote": "Provincias: Córdoba, San Luis y La Pampa. Productores y contratistas de maní. Excluir clientes y contactos en negociación.",
+          "whatsapp": "Fede (maquinaria)",
+          "dailyBudget": 4000,
+          "days": 31,
+          "ads": [
+            {
+              "name": "Precio_Lista",
+              "angle": "Precio",
+              "body": "COLOMBO TWIN MASTER · USD 230.000 + IVA precio de lista (USD 207.000 + IVA con crédito sin subsidio, a confirmar cuál se publica).",
+              "prefilled": "Hola, quiero cotizar la Colombo Twin Master"
+            },
+            {
+              "name": "Banco_Credicoop",
+              "angle": "Financiación Credicoop",
+              "body": "Colombo Twin Master · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar la Colombo con Credicoop"
+            },
+            {
+              "name": "Banco_Bancor",
+              "angle": "Financiación Bancor",
+              "body": "Colombo Twin Master · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar la Colombo con Bancor"
+            },
+            {
+              "name": "Banco_Santander",
+              "angle": "Financiación Santander",
+              "body": "Colombo Twin Master · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar la Colombo con Santander"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROS_Tractores_Chery",
+      "label": "Tractores Chery",
+      "audience": {
+        "zone": "Jujuy, Salta, Tucumán, Catamarca, Santiago del Estero, Santa Fe, Córdoba, San Luis, La Pampa y Buenos Aires.",
+        "who": "Público amplio, sin restringir por género. Señales: agricultura, maquinaria, contratistas.",
+        "exclude": "Clientes y contactos en negociación."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "AO_Chery",
+          "kind": "always_on",
+          "windowLabel": "1/11 – 30/11",
+          "message": "Precio de lista 140 y 225 HP + financiación por banco.",
+          "adsLabel": "4: Precio · Credicoop · Bancor · Santander",
+          "brands": "Chery",
+          "zoneNote": "Provincias: Jujuy, Salta, Tucumán, Catamarca, Santiago del Estero, Santa Fe, Córdoba, San Luis, La Pampa y Buenos Aires. Público amplio con señales de agricultura / maquinaria / contratistas.",
+          "whatsapp": "Fede (maquinaria)",
+          "dailyBudget": 4500,
+          "days": 30,
+          "ads": [
+            {
+              "name": "Precio",
+              "angle": "Precio",
+              "body": "Dos variaciones dentro del mismo anuncio: RC1404-C 140 HP USD 61.100 + IVA y RS2204-C 225 HP USD 110.300 + IVA · precio de lista.",
+              "prefilled": "Hola, quiero cotizar un tractor Chery"
+            },
+            {
+              "name": "Banco_Credicoop",
+              "angle": "Financiación Credicoop",
+              "body": "Chery 140 y 225 HP · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar un Chery con Credicoop"
+            },
+            {
+              "name": "Banco_Bancor",
+              "angle": "Financiación Bancor",
+              "body": "Chery 140 y 225 HP · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar un Chery con Bancor"
+            },
+            {
+              "name": "Banco_Santander",
+              "angle": "Financiación Santander",
+              "body": "Chery 140 y 225 HP · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar un Chery con Santander"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "AO_Chery",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Igual que noviembre. Apagar los bancos que no traigan consultas.",
+          "adsLabel": "4: Precio · Credicoop · Bancor · Santander",
+          "brands": "Chery",
+          "zoneNote": "Provincias: Jujuy, Salta, Tucumán, Catamarca, Santiago del Estero, Santa Fe, Córdoba, San Luis, La Pampa y Buenos Aires. Público amplio con señales de agricultura / maquinaria / contratistas.",
+          "whatsapp": "Fede (maquinaria)",
+          "dailyBudget": 5000,
+          "days": 31,
+          "ads": [
+            {
+              "name": "Precio",
+              "angle": "Precio",
+              "body": "Dos variaciones dentro del mismo anuncio: RC1404-C 140 HP USD 61.100 + IVA y RS2204-C 225 HP USD 110.300 + IVA · precio de lista.",
+              "prefilled": "Hola, quiero cotizar un tractor Chery"
+            },
+            {
+              "name": "Banco_Credicoop",
+              "angle": "Financiación Credicoop",
+              "body": "Chery 140 y 225 HP · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar un Chery con Credicoop"
+            },
+            {
+              "name": "Banco_Bancor",
+              "angle": "Financiación Bancor",
+              "body": "Chery 140 y 225 HP · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar un Chery con Bancor"
+            },
+            {
+              "name": "Banco_Santander",
+              "angle": "Financiación Santander",
+              "body": "Chery 140 y 225 HP · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar un Chery con Santander"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROS_Sembradoras",
+      "label": "Sembradoras",
+      "audience": {
+        "zone": "Igual que hoy (provincias agro).",
+        "who": "Productores y contratistas.",
+        "exclude": "Clientes, contactos e interesados previos en sembradoras."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "AO_Sembradoras",
+          "kind": "off",
+          "windowLabel": "Apagada · se prende cuando se defina",
+          "message": "Sembradoras / cabezales o sembradoras / implementos (a definir). APAGADA: dejar los 4 anuncios listos en borrador.",
+          "adsLabel": "4: Precio · Credicoop · Bancor · Santander",
+          "brands": "A definir",
+          "zoneNote": "Igual que hoy: provincias agro, productores y contratistas. Excluir clientes, contactos e interesados previos en sembradoras.",
+          "whatsapp": "Fede (maquinaria)",
+          "dailyBudget": null,
+          "days": 30,
+          "ads": [
+            {
+              "name": "Precio",
+              "angle": "Precio",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir).",
+              "prefilled": "Hola, vi el anuncio de las sembradoras y quiero pedir precio"
+            },
+            {
+              "name": "Banco_Credicoop",
+              "angle": "Financiación Credicoop",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir) · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar una sembradora con Credicoop"
+            },
+            {
+              "name": "Banco_Bancor",
+              "angle": "Financiación Bancor",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir) · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar una sembradora con Bancor"
+            },
+            {
+              "name": "Banco_Santander",
+              "angle": "Financiación Santander",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir) · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar una sembradora con Santander"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "AO_Sembradoras",
+          "kind": "off",
+          "windowLabel": "Apagada · se prende cuando se defina",
+          "message": "Sembradoras / cabezales o sembradoras / implementos (a definir). APAGADA, igual que noviembre.",
+          "adsLabel": "4: Precio · Credicoop · Bancor · Santander",
+          "brands": "A definir",
+          "zoneNote": "Igual que hoy: provincias agro, productores y contratistas. Excluir clientes, contactos e interesados previos en sembradoras.",
+          "whatsapp": "Fede (maquinaria)",
+          "dailyBudget": null,
+          "days": 31,
+          "ads": [
+            {
+              "name": "Precio",
+              "angle": "Precio",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir).",
+              "prefilled": "Hola, vi el anuncio de las sembradoras y quiero pedir precio"
+            },
+            {
+              "name": "Banco_Credicoop",
+              "angle": "Financiación Credicoop",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir) · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar una sembradora con Credicoop"
+            },
+            {
+              "name": "Banco_Bancor",
+              "angle": "Financiación Bancor",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir) · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar una sembradora con Bancor"
+            },
+            {
+              "name": "Banco_Santander",
+              "angle": "Financiación Santander",
+              "body": "Sembradoras / cabezales o sembradoras / implementos (a definir) · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales.",
+              "prefilled": "Hola, quiero financiar una sembradora con Santander"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROS_Repuestos",
+      "label": "Repuestos",
+      "audience": {
+        "zone": "Las mismas provincias que tiene hoy la campaña (no cambian).",
+        "who": "Quien ya tiene máquina: productores, contratistas, talleres y revendedores.",
+        "exclude": "—"
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "AO_Repuestos",
+          "kind": "always_on",
+          "windowLabel": "1/11 – 30/11",
+          "message": "Stock + logística propia, productos fijos.",
+          "adsLabel": "1: Disponibilidad",
+          "brands": "MaterMacc · ERCA · Fabimag · De Grande",
+          "zoneNote": "Provincias: las mismas que tiene hoy la campaña (no cambian). Productores y contratistas que ya tienen máquina + talleres y revendedores. Sin intereses muy cerrados.",
+          "whatsapp": "Mati (repuestos)",
+          "dailyBudget": 2500,
+          "days": 30,
+          "ads": [
+            {
+              "name": "Stock_Logistica",
+              "angle": "Disponibilidad",
+              "body": "Stock + logística propia. Rotar producto destacado: cubiertas, kits MaterMacc, turbinas, bombas, puntones, discos, fuelles, doble fertilización, barrerastrojo, placas MMT.",
+              "prefilled": "Hola, necesito un repuesto"
+            }
+          ]
+        },
+        {
+          "month": "2026-11-01",
+          "name": "ESP_Campana_Nov26",
+          "kind": "special",
+          "windowLabel": "1/11 – 30/11",
+          "message": "«Te acompañamos durante toda la campaña». Aniversario Gallagro y Día de la Tradición.",
+          "adsLabel": "2: Campaña del mes · Fecha",
+          "brands": "MaterMacc · ERCA · Fabimag",
+          "zoneNote": "Provincias: las mismas que tiene hoy la campaña (no cambian). Productores y contratistas que ya tienen máquina + talleres y revendedores. Sin intereses muy cerrados.",
+          "whatsapp": "Mati (repuestos)",
+          "dailyBudget": 1500,
+          "days": 30,
+          "ads": [
+            {
+              "name": "Campana_Nov",
+              "angle": "Campaña del mes",
+              "body": "«Te acompañamos durante toda la campaña» · MaterMacc, ERCA, Fabimag + promo vigente.",
+              "prefilled": "Hola, vi el anuncio de repuestos para la campaña"
+            },
+            {
+              "name": "Aniversario",
+              "angle": "Fecha",
+              "body": "Aniversario Gallagro y Día de la Tradición (10/11).",
+              "prefilled": "Hola, vi el anuncio de repuestos para la campaña"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "AO_Repuestos",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Stock + logística propia, productos fijos.",
+          "adsLabel": "1: Disponibilidad",
+          "brands": "Varias",
+          "zoneNote": "Provincias: las mismas que tiene hoy la campaña (no cambian). Productores y contratistas que ya tienen máquina + talleres y revendedores. Sin intereses muy cerrados.",
+          "whatsapp": "Mati (repuestos)",
+          "dailyBudget": 2000,
+          "days": 31,
+          "ads": [
+            {
+              "name": "Stock_Logistica",
+              "angle": "Disponibilidad",
+              "body": "Stock + logística propia. Rotar producto destacado: cubiertas, kits MaterMacc, turbinas, bombas, puntones, discos, fuelles, doble fertilización, barrerastrojo, placas MMT.",
+              "prefilled": "Hola, necesito un repuesto"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "ESP_Verano_Dic26",
+          "kind": "special",
+          "windowLabel": "1/12 – 31/12",
+          "message": "«Prepará la campaña antes que empiece la urgencia». Pulverización y cosecha de maní. Fin de año.",
+          "adsLabel": "3: Campaña del mes · Campaña del mes · Fecha",
+          "brands": "Praba · Colombo",
+          "zoneNote": "Provincias: las mismas que tiene hoy la campaña (no cambian). Productores y contratistas que ya tienen máquina + talleres y revendedores. Sin intereses muy cerrados.",
+          "whatsapp": "Mati (repuestos)",
+          "dailyBudget": 2500,
+          "days": 31,
+          "ads": [
+            {
+              "name": "Praba",
+              "angle": "Campaña del mes",
+              "body": "«Prepará la campaña antes que empiece la urgencia» · repuestos de pulverización Praba + promo vigente.",
+              "prefilled": "Hola, necesito repuestos para pulverizadora"
+            },
+            {
+              "name": "Colombo",
+              "angle": "Campaña del mes",
+              "body": "«Prepará la campaña antes que empiece la urgencia» · repuestos Colombo para cosecha de maní + promo vigente.",
+              "prefilled": "Hola, necesito repuestos para Colombo"
+            },
+            {
+              "name": "Fin_de_anio",
+              "angle": "Fecha",
+              "body": "Fin de año, con foco en disponibilidad para el verano.",
+              "prefilled": "Hola, necesito un repuesto"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "creatives": [
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Cosechadoras Colombo",
+      "adSetName": "AO_Colombo",
+      "adName": "Precio_Preventa",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "PREVENTA COLOMBO TWIN MASTER · USD 196.650 + IVA* · pago antes de diciembre · sin entrega de usado. *Pie con condiciones.",
+      "material": "Foto y video de la versión correcta (Twin Master o S) recolectando maní",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Cosechadoras Colombo",
+      "adSetName": "AO_Colombo",
+      "adName": "Banco_Credicoop",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Colombo para tu campaña de maní · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales. Logo Credicoop. Legal con TEA y CFT.",
+      "material": "Video base Colombo + condiciones confirmadas del banco",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Cosechadoras Colombo",
+      "adSetName": "AO_Colombo",
+      "adName": "Banco_Bancor",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Colombo para tu campaña de maní · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales. Logo Bancor. Legal con TEA y CFT.",
+      "material": "Video base Colombo + condiciones confirmadas del banco",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Cosechadoras Colombo",
+      "adSetName": "AO_Colombo",
+      "adName": "Banco_Santander",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Colombo para tu campaña de maní · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales. Logo Santander. Legal con TEA y CFT.",
+      "material": "Video base Colombo + condiciones confirmadas del banco",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Tractores Chery",
+      "adSetName": "AO_Chery",
+      "adName": "Precio · variación 140 HP",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "CHERY RC1404-C · 140 HP · 6 CILINDROS · USD 61.100 + IVA · PRECIO DE LISTA.",
+      "material": "Foto y video real del 140 trabajando",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Tractores Chery",
+      "adSetName": "AO_Chery",
+      "adName": "Precio · variación 225 HP",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "CHERY RS2204-C · 225 HP · USD 110.300 + IVA · PRECIO DE LISTA.",
+      "material": "Foto y video real del 225 trabajando",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Tractores Chery",
+      "adSetName": "AO_Chery",
+      "adName": "Banco_Credicoop",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Tractores Chery 140 y 225 HP · Financiamos hasta el 80% sin IVA · 36 meses · 0% TNA en USD · pagos semestrales. Logo Credicoop. Legal con TEA y CFT.",
+      "material": "Videos base Chery + condiciones confirmadas del banco",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Tractores Chery",
+      "adSetName": "AO_Chery",
+      "adName": "Banco_Bancor",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Tractores Chery 140 y 225 HP · Financiamos hasta el 70% · hasta 60 meses · 26% TNA en pesos · pagos semestrales. Logo Bancor. Legal con TEA y CFT.",
+      "material": "Videos base Chery + condiciones confirmadas del banco",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Tractores Chery",
+      "adSetName": "AO_Chery",
+      "adName": "Banco_Santander",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Tractores Chery 140 y 225 HP · Financiamos hasta el 90% · 36 meses · 9,9% TNA en USD · pagos semestrales. Logo Santander. Legal con TEA y CFT.",
+      "material": "Videos base Chery + condiciones confirmadas del banco",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Repuestos",
+      "adSetName": "AO_Repuestos",
+      "adName": "Stock_Logistica",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Stock + logística propia + producto destacado de la semana.",
+      "material": "Fotos y video del recorrido logístico y del stock",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Repuestos",
+      "adSetName": "ESP_Campana_Nov26",
+      "adName": "Campana_Nov",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "«Te acompañamos durante toda la campaña» · MaterMacc, ERCA, Fabimag + promo vigente.",
+      "material": "Promo del mes (Mati)",
+      "deliverLabel": "Urgente"
+    },
+    {
+      "dueLabel": "1/11",
+      "dueOn": "2026-11-01",
+      "campaignLabel": "Repuestos",
+      "adSetName": "ESP_Campana_Nov26",
+      "adName": "Aniversario",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Aniversario Gallagro + Día de la Tradición (10/11). Video: placa animada.",
+      "material": "Fecha del aniversario",
+      "deliverLabel": "Antes del 5/11"
+    },
+    {
+      "dueLabel": "1/12",
+      "dueOn": "2026-12-01",
+      "campaignLabel": "Cosechadoras Colombo",
+      "adSetName": "AO_Colombo",
+      "adName": "Precio_Lista",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Reemplaza la preventa: COLOMBO TWIN MASTER con precio de lista o de crédito (a confirmar). Los 3 de bancos se reusan.",
+      "material": "Mismo video base, cambia el cierre",
+      "deliverLabel": "15/11"
+    },
+    {
+      "dueLabel": "1/12",
+      "dueOn": "2026-12-01",
+      "campaignLabel": "Repuestos",
+      "adSetName": "ESP_Verano_Dic26",
+      "adName": "Praba",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "«Prepará la campaña antes que empiece la urgencia» · repuestos de pulverización Praba + promo.",
+      "material": "Promo del mes (Mati), fotos de repuestos Praba",
+      "deliverLabel": "15/11"
+    },
+    {
+      "dueLabel": "1/12",
+      "dueOn": "2026-12-01",
+      "campaignLabel": "Repuestos",
+      "adSetName": "ESP_Verano_Dic26",
+      "adName": "Colombo",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "«Prepará la campaña antes que empiece la urgencia» · repuestos Colombo para cosecha de maní + promo.",
+      "material": "Promo del mes (Mati), fotos de repuestos Colombo",
+      "deliverLabel": "15/11"
+    },
+    {
+      "dueLabel": "1/12",
+      "dueOn": "2026-12-01",
+      "campaignLabel": "Repuestos",
+      "adSetName": "ESP_Verano_Dic26",
+      "adName": "Fin_de_anio",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Fin de año con foco en disponibilidad para el verano. Video: placa animada.",
+      "material": "—",
+      "deliverLabel": "15/11"
+    },
+    {
+      "dueLabel": "Cuando se defina",
+      "dueOn": null,
+      "campaignLabel": "Sembradoras (apagada)",
+      "adSetName": "AO_Sembradoras",
+      "adName": "Precio",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Sembradoras / cabezales o sembradoras / implementos (a definir).",
+      "material": "Fotos y video de los equipos",
+      "deliverLabel": "Cuando se defina"
+    },
+    {
+      "dueLabel": "Cuando se defina",
+      "dueOn": null,
+      "campaignLabel": "Sembradoras (apagada)",
+      "adSetName": "AO_Sembradoras",
+      "adName": "Banco_Credicoop",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Sembradoras / cabezales o sembradoras / implementos (a definir).",
+      "material": "Fotos y video de los equipos",
+      "deliverLabel": "Cuando se defina"
+    },
+    {
+      "dueLabel": "Cuando se defina",
+      "dueOn": null,
+      "campaignLabel": "Sembradoras (apagada)",
+      "adSetName": "AO_Sembradoras",
+      "adName": "Banco_Bancor",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Sembradoras / cabezales o sembradoras / implementos (a definir).",
+      "material": "Fotos y video de los equipos",
+      "deliverLabel": "Cuando se defina"
+    },
+    {
+      "dueLabel": "Cuando se defina",
+      "dueOn": null,
+      "campaignLabel": "Sembradoras (apagada)",
+      "adSetName": "AO_Sembradoras",
+      "adName": "Banco_Santander",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Sembradoras / cabezales o sembradoras / implementos (a definir).",
+      "material": "Fotos y video de los equipos",
+      "deliverLabel": "Cuando se defina"
+    }
+  ]
+}

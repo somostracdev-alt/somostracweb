@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createOpsClientAction, deleteOpsPieceAction, saveOpsPieceAction } from "@/app/ops/actions";
+import { OpsSwitch } from "@/components/ops/ops-switch";
 import { labelTone } from "@/lib/ops/labels";
 import type { OpsClient, OpsLabelRow, OpsPiece } from "@/lib/ops/queries";
 
@@ -158,17 +159,18 @@ export function OpsCalendar({
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">TRAC · Planificación</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">Calendario</h1>
+          <OpsSwitch client={client.slug} current="calendario" />
         </div>
         <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
-          <label className="grid text-xs text-[#5c6560]">
-            <span className="flex items-center gap-1">
+          <label className="grid text-xs text-[#5c6560] sm:relative">
+            <span className="mb-1 flex items-center gap-1 sm:absolute sm:bottom-full sm:left-0 sm:mb-1">
               Cliente
               <AddPlus onClick={() => setAddingClient(true)} />
             </span>
             <select
               value={client.slug}
               onChange={(event) => router.push(href(month, event.target.value))}
-              className="mt-1 w-full rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm sm:w-auto"
+              className="w-full rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm sm:w-auto"
             >
               {clients.map((item) => (
                 <option key={item.id} value={item.slug}>

@@ -51,11 +51,22 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           href="/ops"
           target="_blank"
           rel="noreferrer"
-          className="rounded-2xl border border-black/10 p-6 hover:border-black/30 md:col-span-2"
+          className="rounded-2xl border border-black/10 p-6 hover:border-black/30"
         >
           <h2 className="text-lg font-semibold">Calendario</h2>
           <p className="mt-2 text-sm text-black/70">
             Se abre en otra ventana. Ahí se arma el calendario de cada cliente, sin Excel.
+          </p>
+        </a>
+        <a
+          href="/ops/pauta"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-2xl border border-black/10 p-6 hover:border-black/30"
+        >
+          <h2 className="text-lg font-semibold">Pauta</h2>
+          <p className="mt-2 text-sm text-black/70">
+            Campañas, conjuntos y anuncios de Meta. Gallagro ya tiene noviembre y diciembre.
           </p>
         </a>
         {sections.map((section) => (
