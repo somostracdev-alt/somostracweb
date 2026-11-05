@@ -18,10 +18,30 @@ import { getLocale } from "@/lib/locale-server";
 const contentPath = path.join(process.cwd(), "data", "site-content.json");
 const contentBlobName = "content/site-content.json";
 const blobSetupError =
-  "En Vercel hay que crear un Blob store (Storage → Blob), conectarlo a este proyecto y redesplegar para poder guardar fotos y textos.";
+  "En Vercel hay que crear un Blob store (Storage → Blob), conectarlo a Production y Preview, y redesplegar.";
+
+function blobCredentials() {
+  const tokenKey = Object.keys(process.env).find((key) => key.endsWith("BLOB_READ_WRITE_TOKEN"));
+  const storeKey = Object.keys(process.env).find((key) => key.endsWith("BLOB_STORE_ID"));
+  const token = tokenKey ? process.env[tokenKey] : undefined;
+  const storeId = storeKey ? process.env[storeKey] : undefined;
+  return {
+    token: token || undefined,
+    storeId: storeId || undefined,
+  };
+}
 
 function blobConfigured() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  const { token, storeId } = blobCredentials();
+  return Boolean(token || storeId);
+}
+
+function blobOptions() {
+  const { token, storeId } = blobCredentials();
+  return {
+    ...(token ? { token } : {}),
+    ...(storeId ? { storeId } : {}),
+  };
 }
 
 function requireWritableStore() {
@@ -164,7 +184,7 @@ function withSavedAssets(base: SiteContent, saved: SiteContent): SiteContent {
 
 async function readSavedContent(): Promise<SiteContent | null> {
   if (blobConfigured()) {
-    const { blobs } = await list({ prefix: contentBlobName, limit: 10 });
+    const { blobs } = await list({ prefix: contentBlobName, limit: 10, ...blobOptions() });
     const file = blobs.find((item) => item.pathname === contentBlobName);
     if (!file) return null;
     const response = await fetch(file.url, { cache: "no-store" });
@@ -201,6 +221,7 @@ export async function saveSiteContent(content: SiteContent) {
       allowOverwrite: true,
       contentType: "application/json",
       cacheControlMaxAge: 60,
+      ...blobOptions(),
     });
     return;
   }
@@ -236,6 +257,7 @@ export async function saveUploadedImage(file: FormDataEntryValue | null, prefix:
       access: "public",
       addRandomSuffix: false,
       contentType: file.type,
+      ...blobOptions(),
     });
     return blob.url;
   }
