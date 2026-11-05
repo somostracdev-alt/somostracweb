@@ -47,6 +47,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       </div>
       <AdminFlash ok={params.ok} error={params.error} />
       <div className="grid gap-4 md:grid-cols-2">
+        <a
+          href="/ops"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-2xl border border-black/10 p-6 hover:border-black/30 md:col-span-2"
+        >
+          <h2 className="text-lg font-semibold">Sala de clientes</h2>
+          <p className="mt-2 text-sm text-black/70">
+            Se abre en otra ventana. Ahí se arma el calendario de cada cliente, sin Excel.
+          </p>
+        </a>
         {sections.map((section) => (
           <Link key={section.href} href={section.href} className="rounded-2xl border border-black/10 p-6 hover:border-black/30">
             <h2 className="text-lg font-semibold">{section.title}</h2>

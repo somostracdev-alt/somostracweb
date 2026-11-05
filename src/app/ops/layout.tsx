@@ -1,0 +1,19 @@
+import { redirect } from "next/navigation";
+
+import { isAdminAuthenticated } from "@/lib/admin-session";
+
+import "./ops.css";
+
+export const instant = false;
+
+export const metadata = {
+  title: "Sala de clientes",
+};
+
+export default async function OpsLayout({ children }: { children: React.ReactNode }) {
+  if (!(await isAdminAuthenticated())) {
+    redirect("/login?next=/ops");
+  }
+
+  return <div className="ops-app">{children}</div>;
+}

@@ -38,6 +38,14 @@ export function AdminNav() {
         })}
       </nav>
       <div className="space-y-2 px-3 py-4">
+        <a
+          href="/ops"
+          target="_blank"
+          rel="noreferrer"
+          className="block rounded-xl px-3 py-2 text-sm hover:bg-black/5"
+        >
+          Sala de clientes
+        </a>
         <Link href="/" className="block rounded-xl px-3 py-2 text-sm hover:bg-black/5">
           Ver el sitio
         </Link>

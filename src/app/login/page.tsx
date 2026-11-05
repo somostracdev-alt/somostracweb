@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 
 import { loginAdminAction } from "./actions";
 import { isAdminAuthenticated } from "@/lib/admin-session";
+import { safeNext } from "@/lib/ops/safe-next";
 
-type SearchParams = Promise<{ error?: string; aviso?: string }>;
+type SearchParams = Promise<{ error?: string; aviso?: string; next?: string }>;
 
 export const instant = false;
 
@@ -14,8 +15,9 @@ export const metadata = {
 
 export default async function LoginPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
+  const next = safeNext(params.next);
   if (await isAdminAuthenticated()) {
-    redirect("/admin");
+    redirect(next || "/admin");
   }
 
   return (
@@ -34,6 +36,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
         ) : null}
 
         <form action={loginAdminAction} className="space-y-4 rounded-2xl border border-black/10 p-6">
+          {next ? <input type="hidden" name="next" value={next} /> : null}
           <label className="grid gap-1 text-sm">
             Usuario
             <input

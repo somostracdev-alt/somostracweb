@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { loginAsAdmin, logoutAdmin } from "@/lib/admin-session";
+import { safeNext } from "@/lib/ops/safe-next";
 
 export async function loginAdminAction(formData: FormData) {
   const identifier = String(formData.get("email") ?? "")
@@ -30,7 +31,7 @@ export async function loginAdminAction(formData: FormData) {
     redirect("/login?error=" + encodeURIComponent("Credenciales inválidas"));
   }
 
-  redirect("/admin");
+  redirect(safeNext(formData.get("next")) || "/admin");
 }
 
 export async function logoutAdminAction() {
