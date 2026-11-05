@@ -129,10 +129,21 @@ export function OpsCalendar({
   const href = (nextMonth: string, nextClient = client.slug) =>
     `/ops?client=${encodeURIComponent(nextClient)}&month=${encodeURIComponent(nextMonth)}`;
 
-  const counts = labelsOf(labels, "pillar").map((pillar) => ({
-    ...pillar,
-    count: pieces.filter((piece) => piece.pillar === pillar.name && piece.publishOn.startsWith(month)).length,
-  }));
+  const monthPieces = pieces.filter((piece) => piece.publishOn.startsWith(month));
+  const monthTallies = {
+    pillar: labelsOf(labels, "pillar").map((item) => ({
+      ...item,
+      count: monthPieces.filter((piece) => piece.pillar === item.name).length,
+    })),
+    format: labelsOf(labels, "format").map((item) => ({
+      ...item,
+      count: monthPieces.filter((piece) => piece.format === item.name).length,
+    })),
+    status: labelsOf(labels, "status").map((item) => ({
+      ...item,
+      count: monthPieces.filter((piece) => piece.status === item.name).length,
+    })),
+  };
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-4 py-5 sm:px-6">
@@ -230,14 +241,22 @@ export function OpsCalendar({
         </div>
       </section>
 
-      <div className="mb-3 flex flex-wrap gap-2">
-        {counts.map((pillar) => (
-          <span key={pillar.id} className="ops-chip" style={labelTone(pillar.color)}>
-            <span className="ops-chip-dot" style={{ background: pillar.color }} />
-            {pillar.name} {pillar.count}
-          </span>
-        ))}
-      </div>
+      <section className="mb-5 rounded-2xl bg-[#f3f1eb] p-4">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold">Cómo quedó el mes</h2>
+            <p className="mt-1 text-xs text-[#6b726c]">Se completa solo con las piezas de {monthNames[monthNumber - 1].toLowerCase()}.</p>
+          </div>
+          <p className="text-sm text-[#5c6560]">
+            Piezas cargadas <span className="ml-2 text-2xl font-semibold text-[#2a302c]">{monthPieces.length}</span>
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <MonthTally title="Por pilar" rows={monthTallies.pillar} />
+          <MonthTally title="Por formato" rows={monthTallies.format} />
+          <MonthTally title="Por estado" rows={monthTallies.status} />
+        </div>
+      </section>
 
       <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-[#6b726c]">
         {weekdayNames.map((name) => (
@@ -299,6 +318,31 @@ export function OpsCalendar({
           onClose={() => setOpen(null)}
         />
       ) : null}
+    </div>
+  );
+}
+
+function MonthTally({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: { id: string; name: string; color: string; count: number }[];
+}) {
+  return (
+    <div>
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6b726c]">{title}</p>
+      <ul className="space-y-1">
+        {rows.map((row) => (
+          <li key={row.id} className="flex items-center justify-between gap-3 text-sm">
+            <span className="ops-chip" style={labelTone(row.color)}>
+              <span className="ops-chip-dot" style={{ background: row.color }} />
+              {row.name}
+            </span>
+            <span className="font-semibold tabular-nums text-[#2a302c]">{row.count}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
