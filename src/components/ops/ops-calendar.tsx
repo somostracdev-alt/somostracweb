@@ -463,6 +463,7 @@ function PiecePeek({
               {formatDate(piece.publishOn)}
               {piece.timeLabel ? ` · ${piece.timeLabel}` : ""}
             </p>
+            <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b726c]">Tema</p>
             <h2 className="mt-1 text-2xl font-semibold">{piece.theme || "Sin tema todavía"}</h2>
           </div>
           <button type="button" onClick={onClose} className="rounded-full px-3 py-1 text-sm">
