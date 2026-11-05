@@ -372,13 +372,23 @@ function DetailLine({ label, value }: { label: string; value: string }) {
   );
 }
 
+const tagKindLabels: Record<OpsLabelRow["kind"], string> = {
+  account: "Cuenta",
+  format: "Formato",
+  pillar: "Pilar",
+  status: "Estado",
+};
+
 function Tag({ labels, kind, name }: { labels: OpsLabelRow[]; kind: OpsLabelRow["kind"]; name: string }) {
   if (!name) return null;
   const color = colorFor(labels, kind, name);
   return (
-    <span className="ops-chip" style={labelTone(color)}>
-      <span className="ops-chip-dot" style={{ background: color }} />
-      {name}
+    <span className="grid justify-items-start gap-1">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b726c]">{tagKindLabels[kind]}</span>
+      <span className="ops-chip" style={labelTone(color)}>
+        <span className="ops-chip-dot" style={{ background: color }} />
+        {name}
+      </span>
     </span>
   );
 }
@@ -413,7 +423,7 @@ function PiecePeek({
             Cerrar
           </button>
         </div>
-        <div className="mb-5 flex flex-wrap gap-1.5">
+        <div className="mb-5 flex flex-wrap gap-x-4 gap-y-3">
           <Tag labels={labels} kind="account" name={piece.account} />
           <Tag labels={labels} kind="format" name={piece.format} />
           <Tag labels={labels} kind="pillar" name={piece.pillar} />
