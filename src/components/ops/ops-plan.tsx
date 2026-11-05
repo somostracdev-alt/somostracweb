@@ -14,6 +14,8 @@ import {
   saveOpsCreativeAction,
   toggleOpsPlanNoteAction,
 } from "@/app/ops/pauta/actions";
+import { createOpsClientAction } from "@/app/ops/actions";
+import { monthKeyFromDate, pautaMonthOptions } from "@/lib/ops/months";
 import { OpsSwitch } from "@/components/ops/ops-switch";
 import { useOpsPending } from "@/components/ops/ops-pending";
 import type { OpsPlan, PlanAd, PlanAdSet, PlanCampaign, PlanCreative } from "@/lib/ops/plan-queries";
@@ -53,7 +55,8 @@ type Peek =
   | null;
 
 type Editor =
-  | { kind: "campaign" | "audience" | "creative"; id: string }
+  | { kind: "audience" | "creative"; id: string }
+  | { kind: "campaign"; id: string; month?: string }
   | { kind: "set"; id: string; campaignId: string }
   | { kind: "ad"; id: string; setId: string }
   | null;
@@ -170,17 +173,20 @@ export function OpsPlanView({
   const startPending = useOpsPending();
   const [peek, setPeek] = useState<Peek>(null);
   const [editor, setEditor] = useState<Editor>(null);
+  const [addingClient, setAddingClient] = useState(false);
   const href = (nextView: string, nextClient = client.slug) =>
     `/ops/pauta?client=${encodeURIComponent(nextClient)}&view=${encodeURIComponent(nextView)}`;
   const monthKey = /^\d{4}-\d{2}$/.test(view) ? `${view}-01` : "";
+  const summary = plan ? planSummary(plan) : "";
 
   useEffect(() => {
     setEditor(null);
     setPeek(null);
+    setAddingClient(false);
   }, [notice?.ok, notice?.error, view]);
 
+  const monthOptions = pautaMonthOptions(/^\d{4}-\d{2}$/.test(view) ? view : "");
   const tabs = [
-    ...(plan?.months.map((month) => ({ id: month.month.slice(0, 7), label: monthTitle(month.month) })) ?? []),
     { id: "creativos", label: "Creativos" },
     { id: "publicos", label: "Públicos" },
     { id: "pendientes", label: "Pendientes" },
@@ -196,7 +202,12 @@ export function OpsPlanView({
         </div>
         <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
           <label className="grid text-xs text-[#5c6560] sm:relative">
-            <span className="mb-1 sm:absolute sm:bottom-full sm:left-0 sm:mb-1">Cliente</span>
+            <span className="mb-1 flex items-center gap-1 sm:absolute sm:bottom-full sm:left-0 sm:mb-1">
+              Cliente
+              <button type="button" className="ops-add" onClick={() => setAddingClient(true)} aria-label="Nuevo cliente">
+                +<span className="ops-add-label">nuevo</span>
+              </button>
+            </span>
             <select
               value={client.slug}
               onChange={(event) => {
@@ -214,7 +225,7 @@ export function OpsPlanView({
           </label>
           <button
             type="button"
-            onClick={() => setEditor({ kind: "campaign", id: "" })}
+            onClick={() => setEditor({ kind: "campaign", id: "", month: monthKey || `${monthKeyFromDate(new Date())}-01` })}
             className="rounded-full bg-[#4f6f52] px-4 py-2.5 text-sm text-[#f7f5f0] sm:py-2"
           >
             Nueva campaña
@@ -225,10 +236,12 @@ export function OpsPlanView({
       {notice?.ok ? <p className="mb-4 rounded-xl bg-[#d7e4d6] px-4 py-2 text-sm">{notice.ok}</p> : null}
       {notice?.error ? <p className="mb-4 rounded-xl bg-[#f0d7d2] px-4 py-2 text-sm">{notice.error}</p> : null}
 
+      {addingClient ? <PautaClientForm clientSlug={client.slug} onClose={() => setAddingClient(false)} /> : null}
+
       {!plan ? (
         <button
           type="button"
-          onClick={() => setEditor({ kind: "campaign", id: "" })}
+          onClick={() => setEditor({ kind: "campaign", id: "", month: monthKey || `${monthKeyFromDate(new Date())}-01` })}
           className="rounded-2xl border border-dashed border-[#b7bdb6] bg-[#f3f1eb] px-4 py-8 text-left"
         >
           <Caption>Agregar</Caption>
@@ -237,10 +250,27 @@ export function OpsPlanView({
         </button>
       ) : (
         <>
-          <p className="mb-4 text-sm text-[#5c6560]">
-            {plan.platform} · cuenta {plan.accountRef} · {plan.channels} · destino {plan.destination}
-          </p>
-          <div className="ops-scroll-x mb-5 flex max-w-full gap-2 overflow-x-auto">
+          {summary ? <p className="mb-4 text-sm text-[#5c6560]">{summary}</p> : null}
+          <div className="mb-5 flex max-w-full flex-wrap items-end gap-2">
+            <label className="grid text-xs text-[#5c6560]">
+              <span className="mb-1">Mes</span>
+              <select
+                value={/^\d{4}-\d{2}$/.test(view) ? view : ""}
+                onChange={(event) => {
+                  if (!event.target.value || event.target.value === view) return;
+                  startPending();
+                  router.push(href(event.target.value));
+                }}
+                className="rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm"
+              >
+                {/^\d{4}-\d{2}$/.test(view) ? null : <option value="">Elegir mes</option>}
+                {monthOptions.map((month) => (
+                  <option key={month} value={month}>
+                    {monthTitle(month)}
+                  </option>
+                ))}
+              </select>
+            </label>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -265,7 +295,7 @@ export function OpsPlanView({
               onCampaign={(id) => setPeek({ kind: "campaign", id })}
               onSet={(id) => setPeek({ kind: "set", id })}
               onNewSet={(campaignId) => setEditor({ kind: "set", id: "", campaignId })}
-              onNewCampaign={() => setEditor({ kind: "campaign", id: "" })}
+              onNewCampaign={() => setEditor({ kind: "campaign", id: "", month: monthKey })}
             />
           ) : null}
           {view === "creativos" ? <CreativeBoard plan={plan} onOpen={(id) => setPeek({ kind: "creative", id })} /> : null}
@@ -342,6 +372,7 @@ export function OpsPlanView({
           campaign={plan?.campaigns.find((item) => item.id === editor.id) ?? null}
           client={client}
           view={view}
+          monthDefault={editor.month ? editor.month.slice(0, 7) : monthKeyFromDate(new Date())}
           onClose={() => setEditor(null)}
         />
       ) : null}
@@ -379,6 +410,54 @@ export function OpsPlanView({
           onClose={() => setEditor(null)}
         />
       ) : null}
+    </div>
+  );
+}
+
+function planSummary(plan: OpsPlan) {
+  return [
+    plan.platform,
+    plan.accountRef ? `cuenta ${plan.accountRef}` : "",
+    plan.channels,
+    plan.destination ? `destino ${plan.destination}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function PautaClientForm({ clientSlug, onClose }: { clientSlug: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a302c]/30 px-3" onClick={onClose}>
+      <div className="ops-modal p-6" onClick={(event) => event.stopPropagation()}>
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b726c]">Pauta</p>
+            <h2 className="mt-1 text-2xl font-semibold">Nuevo cliente</h2>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full px-3 py-1 text-sm">
+            Cerrar
+          </button>
+        </div>
+        <form action={createOpsClientAction} className="grid gap-3">
+          <input type="hidden" name="surface" value="pauta" />
+          <input type="hidden" name="clientSlug" value={clientSlug} />
+          <label className="grid gap-1 text-xs">
+            Nombre
+            <input name="name" required autoFocus className={field} placeholder="Ej. Gallagro" />
+          </label>
+          <label className="grid gap-1 text-xs">
+            Cuenta
+            <input name="account" required className={field} placeholder="Ej. 972807331813501" />
+          </label>
+          <label className="grid gap-1 text-xs">
+            Destino
+            <input name="destination" required className={field} placeholder="Ej. WhatsApp" />
+          </label>
+          <button type="submit" className="mt-2 w-fit rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
+            Crear
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -458,7 +537,7 @@ function MonthBoard({
         </details>
       ) : null}
 
-      {plan.campaigns.map((campaign) => {
+      {plan.campaigns.filter((campaign) => campaign.month === monthKey).map((campaign) => {
         const rows = campaign.sets.filter((set) => set.month === monthKey);
         return (
           <section key={campaign.id} className="rounded-2xl bg-[#f3f1eb] p-4">
@@ -467,6 +546,11 @@ function MonthBoard({
                 <Caption>Campaña</Caption>
                 <h2 className="truncate text-base font-semibold">{campaign.label || campaign.name}</h2>
                 <p className="truncate text-xs text-[#6b726c]">{campaign.name}</p>
+                {campaign.spanFrom.slice(0, 7) !== campaign.spanTo.slice(0, 7) ? (
+                  <p className="truncate text-xs text-[#6b726c]">
+                    {monthTitle(campaign.spanFrom)} – {monthTitle(campaign.spanTo)}
+                  </p>
+                ) : null}
               </button>
               <button
                 type="button"
@@ -570,25 +654,32 @@ function CreativeBoard({ plan, onOpen }: { plan: OpsPlan; onOpen: (id: string) =
 }
 
 function AudienceBoard({ plan, onOpen }: { plan: OpsPlan; onOpen: (id: string) => void }) {
+  const campaigns = plan.campaigns.filter((campaign, index) => plan.campaigns.findIndex((item) => item.seriesId === campaign.seriesId) === index);
   return (
     <div className="grid gap-2">
-      {plan.campaigns.map((campaign) => (
-        <button
-          key={campaign.id}
-          type="button"
-          onClick={() => onOpen(campaign.id)}
-          className="flex w-full min-w-0 items-center gap-3 rounded-2xl bg-[#f3f1eb] px-4 py-3 text-left"
-        >
-          <span className="min-w-0 flex-1">
-            <Caption>Campaña</Caption>
-            <span className="block truncate text-sm font-semibold">{campaign.label || campaign.name}</span>
-          </span>
-          <span className="min-w-0 max-w-[55%] text-right">
-            <Caption>Zona</Caption>
-            <span className="block truncate text-sm">{campaign.audience?.zone || "Sin público"}</span>
-          </span>
-        </button>
-      ))}
+      {campaigns.map((campaign) => {
+        const span = campaign.spanFrom.slice(0, 7) === campaign.spanTo.slice(0, 7)
+          ? monthTitle(campaign.month)
+          : `${monthTitle(campaign.spanFrom)} – ${monthTitle(campaign.spanTo)}`;
+        return (
+          <button
+            key={campaign.seriesId}
+            type="button"
+            onClick={() => onOpen(campaign.id)}
+            className="flex w-full min-w-0 items-center gap-3 rounded-2xl bg-[#f3f1eb] px-4 py-3 text-left"
+          >
+            <span className="min-w-0 flex-1">
+              <Caption>Campaña</Caption>
+              <span className="block truncate text-sm font-semibold">{campaign.label || campaign.name}</span>
+              <span className="block truncate text-xs text-[#6b726c]">{span}</span>
+            </span>
+            <span className="min-w-0 max-w-[55%] text-right">
+              <Caption>Zona</Caption>
+              <span className="block truncate text-sm">{campaign.audience?.zone || "Sin público"}</span>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -683,7 +774,7 @@ function CampaignPeek({
         <button type="button" onClick={() => onEdit(campaign.id)} className="rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
           Editar
         </button>
-        <form action={deleteOpsCampaignAction} onSubmit={confirmDelete("¿Eliminar esta campaña y sus conjuntos?")}>
+        <form action={deleteOpsCampaignAction} onSubmit={confirmDelete("¿Eliminar esta campaña solo en este mes?")}>
           <input type="hidden" name="id" value={campaign.id} />
           <input type="hidden" name="clientSlug" value={client.slug} />
           <input type="hidden" name="view" value={view} />
@@ -892,17 +983,29 @@ function Drawer({ kicker, title, onClose, children }: { kicker: string; title: s
   );
 }
 
+function openMonthPicker(input: HTMLInputElement) {
+  try {
+    input.showPicker();
+  } catch {
+    input.focus();
+  }
+}
+
 function CampaignDrawer({
   campaign,
   client,
   view,
+  monthDefault,
   onClose,
 }: {
   campaign: PlanCampaign | null;
   client: OpsClient;
   view: string;
+  monthDefault: string;
   onClose: () => void;
 }) {
+  const spanFrom = campaign?.spanFrom.slice(0, 7) || monthDefault;
+  const spanTo = campaign?.spanTo.slice(0, 7) || monthDefault;
   return (
     <Drawer kicker="Campaña" title={campaign ? "Editar campaña" : "Nueva campaña"} onClose={onClose}>
       <form action={saveOpsCampaignAction} className="grid gap-3">
@@ -918,6 +1021,33 @@ function CampaignDrawer({
           Nombre en la cuenta
           <input name="name" defaultValue={campaign?.name ?? ""} className={field} placeholder="Ej. PROS_Repuestos" />
         </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1 text-xs">
+            Desde
+            <input
+              type="month"
+              name="spanFrom"
+              required
+              defaultValue={spanFrom}
+              className={field}
+              onClick={(event) => openMonthPicker(event.currentTarget)}
+            />
+          </label>
+          <label className="grid gap-1 text-xs">
+            Hasta
+            <input
+              type="month"
+              name="spanTo"
+              required
+              defaultValue={spanTo}
+              className={field}
+              onClick={(event) => openMonthPicker(event.currentTarget)}
+            />
+          </label>
+        </div>
+        <p className="text-xs text-[#5c6560]">
+          En cada mes nuevo se copian el Always on y el Apagado, con sus anuncios. El Especial queda en su mes. El público es uno para toda la campaña.
+        </p>
         <button type="submit" className="mt-2 w-fit rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
           {campaign ? "Guardar" : "Crear"}
         </button>
@@ -1194,6 +1324,7 @@ function AudienceDrawer({
   return (
     <Drawer kicker={campaign.label || campaign.name} title="Editar público" onClose={onClose}>
       <form action={saveOpsAudienceAction} className="grid gap-3">
+        <p className="text-xs text-[#5c6560]">Vale para todos los meses de esta campaña.</p>
         <input type="hidden" name="campaignId" value={campaign.id} />
         <input type="hidden" name="clientSlug" value={client.slug} />
         <input type="hidden" name="view" value={view} />

@@ -3,6 +3,7 @@ import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import { defaultLabels } from "@/lib/ops/labels";
 import { seedGallagroPlan } from "@/lib/ops/seed-plan";
 import gallagroPieces from "@/ops/seed/gallagro-pieces.json";
+import gallagroPlan from "@/ops/seed/gallagro-plan.json";
 
 type Sql = NeonQueryFunction<false, false>;
 
@@ -207,8 +208,232 @@ export async function ensureOpsSchema() {
   await client`CREATE INDEX IF NOT EXISTS ops_creatives_plan_idx ON ops_creatives (plan_id)`;
   await seedGallagro(client);
   await seedGallagroPlan(client);
+  await migrateCampaignMonths(client);
   ready = true;
   return client;
+}
+
+function isoDate(value: unknown) {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value ?? "").slice(0, 10);
+}
+
+async function migrateCampaignMonths(client: Sql) {
+  await client`ALTER TABLE ops_campaigns ADD COLUMN IF NOT EXISTS month date`;
+  await client`ALTER TABLE ops_campaigns ADD COLUMN IF NOT EXISTS monthly boolean NOT NULL DEFAULT false`;
+  await client`ALTER TABLE ops_campaigns ADD COLUMN IF NOT EXISTS series_id uuid`;
+  await client`ALTER TABLE ops_campaigns DROP CONSTRAINT IF EXISTS ops_campaigns_plan_id_name_key`;
+
+  const pending = await client`SELECT id, plan_id FROM ops_campaigns WHERE month IS NULL`;
+  for (const row of pending) {
+    const id = String(row.id);
+    const planId = String(row.plan_id);
+    const months = await client`
+      SELECT month FROM (
+        SELECT month FROM ops_plan_months WHERE plan_id = ${planId}
+        UNION
+        SELECT month FROM ops_ad_sets WHERE campaign_id = ${id}
+      ) months
+      ORDER BY month
+    `;
+    const list = months.map((item) => isoDate(item.month)).filter((month) => /^\d{4}-\d{2}-\d{2}$/.test(month));
+    if (!list.length) {
+      const now = new Date();
+      list.push(`${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-01`);
+    }
+    const series = await client`SELECT gen_random_uuid() AS id`;
+    const seriesId = String(series[0].id);
+    const [first, ...rest] = list;
+    await client`
+      UPDATE ops_campaigns
+      SET month = ${first}::date, monthly = true, series_id = ${seriesId}
+      WHERE id = ${id}
+    `;
+    const audience = await client`
+      SELECT zone, audience, exclude_note FROM ops_audiences WHERE campaign_id = ${id}
+    `;
+    for (const month of rest) {
+      const existing = await client`
+        SELECT id FROM ops_campaigns
+        WHERE plan_id = ${planId}
+          AND name = (SELECT name FROM ops_campaigns WHERE id = ${id})
+          AND month = ${month}::date
+          AND id <> ${id}
+        LIMIT 1
+      `;
+      let copyId = existing[0] ? String(existing[0].id) : "";
+      if (!copyId) {
+        const created = await client`
+          INSERT INTO ops_campaigns (plan_id, name, label, sort, month, monthly, series_id)
+          SELECT plan_id, name, label, sort, ${month}::date, true, ${seriesId}::uuid
+          FROM ops_campaigns
+          WHERE id = ${id}
+          RETURNING id
+        `;
+        copyId = String(created[0].id);
+        if (audience[0]) {
+          await client`
+            INSERT INTO ops_audiences (campaign_id, zone, audience, exclude_note)
+            VALUES (${copyId}, ${String(audience[0].zone ?? "")}, ${String(audience[0].audience ?? "")}, ${String(audience[0].exclude_note ?? "")})
+          `;
+        }
+      }
+      await client`
+        UPDATE ops_ad_sets
+        SET campaign_id = ${copyId}
+        WHERE campaign_id = ${id} AND month = ${month}::date
+      `;
+    }
+  }
+
+  const duplicated = await client`
+    SELECT plan_id, month, name
+    FROM ops_campaigns
+    WHERE month IS NOT NULL
+    GROUP BY plan_id, month, name
+    HAVING count(*) > 1
+  `;
+  for (const group of duplicated) {
+    const copies = await client`
+      SELECT c.id, count(s.id)::int AS sets
+      FROM ops_campaigns c
+      LEFT JOIN ops_ad_sets s ON s.campaign_id = c.id
+      WHERE c.plan_id = ${String(group.plan_id)}
+        AND c.month = ${group.month}
+        AND c.name = ${String(group.name)}
+      GROUP BY c.id
+      ORDER BY count(s.id) DESC, c.id
+    `;
+    const keeper = String(copies[0].id);
+    for (const extra of copies.slice(1)) {
+      const dup = String(extra.id);
+      await client`UPDATE ops_ad_sets SET campaign_id = ${keeper} WHERE campaign_id = ${dup}`;
+      const keeperAudience = await client`SELECT id FROM ops_audiences WHERE campaign_id = ${keeper} LIMIT 1`;
+      if (keeperAudience[0]) await client`DELETE FROM ops_audiences WHERE campaign_id = ${dup}`;
+      else await client`UPDATE ops_audiences SET campaign_id = ${keeper} WHERE campaign_id = ${dup}`;
+      await client`DELETE FROM ops_campaigns WHERE id = ${dup}`;
+    }
+    const series = await client`
+      SELECT series_id FROM ops_campaigns
+      WHERE plan_id = ${String(group.plan_id)} AND name = ${String(group.name)} AND series_id IS NOT NULL
+      ORDER BY month
+      LIMIT 1
+    `;
+    if (series[0]?.series_id) {
+      await client`
+        UPDATE ops_campaigns
+        SET series_id = ${String(series[0].series_id)}::uuid
+        WHERE plan_id = ${String(group.plan_id)} AND name = ${String(group.name)}
+      `;
+    }
+  }
+
+  await client`
+    CREATE UNIQUE INDEX IF NOT EXISTS ops_campaigns_plan_month_name_idx
+    ON ops_campaigns (plan_id, month, name)
+  `;
+  await client`CREATE INDEX IF NOT EXISTS ops_campaigns_series_idx ON ops_campaigns (series_id, month)`;
+  await client`ALTER TABLE ops_campaigns ALTER COLUMN month SET NOT NULL`;
+  await client`ALTER TABLE ops_campaigns ALTER COLUMN series_id SET NOT NULL`;
+  await client`ALTER TABLE ops_campaigns ADD COLUMN IF NOT EXISTS span_from date`;
+  await client`ALTER TABLE ops_campaigns ADD COLUMN IF NOT EXISTS span_to date`;
+  await client`
+    UPDATE ops_campaigns AS campaign
+    SET span_from = bounds.span_from, span_to = bounds.span_to
+    FROM (
+      SELECT series_id, min(month) AS span_from, max(month) AS span_to
+      FROM ops_campaigns
+      GROUP BY series_id
+    ) AS bounds
+    WHERE campaign.series_id = bounds.series_id
+      AND campaign.span_from IS NULL
+  `;
+  await shareAudienceBySeries(client);
+}
+
+async function separateSharedSeries(client: Sql) {
+  const shared = await client`
+    SELECT series_id FROM ops_campaigns
+    GROUP BY series_id
+    HAVING count(DISTINCT name) > 1
+  `;
+  for (const row of shared) {
+    const seriesId = String(row.series_id);
+    const names = await client`
+      SELECT DISTINCT name FROM ops_campaigns WHERE series_id = ${seriesId}::uuid ORDER BY name
+    `;
+    const audience = await client`SELECT zone FROM ops_audiences WHERE series_id = ${seriesId}::uuid LIMIT 1`;
+    const zone = String(audience[0]?.zone ?? "");
+    const owner = gallagroPlan.campaigns.find((campaign) => campaign.audience?.zone === zone)?.name ?? String(names[0]?.name ?? "");
+    for (const nameRow of names) {
+      const name = String(nameRow.name);
+      if (name === owner) continue;
+      const fresh = await client`SELECT gen_random_uuid() AS id`;
+      await client`
+        UPDATE ops_campaigns
+        SET series_id = ${String(fresh[0].id)}::uuid
+        WHERE series_id = ${seriesId}::uuid AND name = ${name}
+      `;
+    }
+  }
+}
+
+async function restoreMissingAudiences(client: Sql) {
+  const missing = await client`
+    SELECT campaign.series_id, campaign.name
+    FROM ops_campaigns AS campaign
+    LEFT JOIN ops_audiences AS audience ON audience.series_id = campaign.series_id
+    WHERE audience.id IS NULL
+    GROUP BY campaign.series_id, campaign.name
+  `;
+  for (const row of missing) {
+    const source = gallagroPlan.campaigns.find((campaign) => campaign.name === String(row.name));
+    if (!source?.audience) continue;
+    await client`
+      INSERT INTO ops_audiences (series_id, zone, audience, exclude_note)
+      VALUES (${String(row.series_id)}::uuid, ${source.audience.zone}, ${source.audience.who}, ${source.audience.exclude})
+      ON CONFLICT (series_id) DO NOTHING
+    `;
+  }
+}
+
+async function shareAudienceBySeries(client: Sql) {
+  await client`ALTER TABLE ops_audiences ADD COLUMN IF NOT EXISTS series_id uuid`;
+  await separateSharedSeries(client);
+  await client`
+    UPDATE ops_audiences AS audience
+    SET series_id = campaign.series_id
+    FROM ops_campaigns AS campaign
+    WHERE audience.campaign_id = campaign.id
+      AND audience.series_id IS NULL
+  `;
+  const duplicated = await client`
+    SELECT series_id FROM ops_audiences
+    WHERE series_id IS NOT NULL
+    GROUP BY series_id
+    HAVING count(*) > 1
+  `;
+  for (const row of duplicated) {
+    const seriesId = String(row.series_id);
+    const keeper = await client`
+      SELECT audience.id
+      FROM ops_audiences AS audience
+      JOIN ops_campaigns AS campaign ON campaign.id = audience.campaign_id
+      WHERE audience.series_id = ${seriesId}::uuid
+      ORDER BY campaign.month, audience.id
+      LIMIT 1
+    `;
+    if (!keeper[0]) continue;
+    await client`
+      DELETE FROM ops_audiences
+      WHERE series_id = ${seriesId}::uuid AND id <> ${String(keeper[0].id)}
+    `;
+  }
+  await client`ALTER TABLE ops_audiences DROP CONSTRAINT IF EXISTS ops_audiences_campaign_id_fkey`;
+  await client`ALTER TABLE ops_audiences DROP CONSTRAINT IF EXISTS ops_audiences_campaign_id_key`;
+  await client`ALTER TABLE ops_audiences ALTER COLUMN campaign_id DROP NOT NULL`;
+  await client`CREATE UNIQUE INDEX IF NOT EXISTS ops_audiences_series_idx ON ops_audiences (series_id)`;
+  await restoreMissingAudiences(client);
 }
 
 async function seedGallagro(client: Sql) {

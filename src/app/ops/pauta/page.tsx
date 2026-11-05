@@ -2,6 +2,7 @@ import { connection } from "next/server";
 
 import { OpsPlanView } from "@/components/ops/ops-plan";
 import { databaseUrl, describeDatabaseUrl } from "@/lib/ops/db";
+import { monthKeyFromDate, pautaMonthOptions } from "@/lib/ops/months";
 import { getOpsPlan } from "@/lib/ops/plan-queries";
 import { getOpsClient, listOpsClients } from "@/lib/ops/queries";
 
@@ -41,10 +42,9 @@ export default async function OpsPlanPage({ searchParams }: { searchParams: Sear
     }
     const plan = await getOpsPlan(client.id);
     const monthViews = plan?.months.map((month) => month.month.slice(0, 7)) ?? [];
-    const allowed = new Set([...monthViews, "creativos", "publicos", "pendientes"]);
-    const today = new Date().toISOString().slice(0, 7);
-    const fallback = monthViews.includes(today) ? today : (monthViews[0] ?? "creativos");
-    const view = params.view && allowed.has(params.view) ? params.view : fallback;
+    const allowed = new Set([...pautaMonthOptions(), ...monthViews, "creativos", "publicos", "pendientes"]);
+    const today = monthKeyFromDate(new Date());
+    const view = params.view && allowed.has(params.view) ? params.view : today;
 
     return (
       <OpsPlanView

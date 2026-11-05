@@ -85,11 +85,15 @@ function slugify(name: string) {
   return slug || "cliente";
 }
 
-export async function createOpsClient(name: string) {
+export async function createOpsClient(name: string, account: string, destination: string) {
   const sql = await ensureOpsSchema();
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
   const trimmed = name.trim();
+  const accountRef = account.trim();
+  const destinationRef = destination.trim();
   if (!trimmed) throw new Error("Falta el nombre del cliente.");
+  if (!accountRef) throw new Error("Falta la cuenta.");
+  if (!destinationRef) throw new Error("Falta el destino.");
 
   let slug = slugify(trimmed);
   const existing = await sql`SELECT slug FROM ops_clients WHERE slug = ${slug} OR slug LIKE ${`${slug}-%`}`;
@@ -105,6 +109,10 @@ export async function createOpsClient(name: string) {
     RETURNING id, slug, name
   `;
   const clientId = String(created[0].id);
+  await sql`
+    INSERT INTO ops_plans (client_id, name, account_ref, destination)
+    VALUES (${clientId}, ${"Pauta"}, ${accountRef}, ${destinationRef})
+  `;
   const labels = [
     { kind: "account" as const, name: trimmed, color: "#4f6f52", sort: 0 },
     ...defaultLabels.filter((label) => label.kind !== "account"),

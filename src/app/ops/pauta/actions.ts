@@ -7,7 +7,6 @@ import { isAdminAuthenticated } from "@/lib/admin-session";
 import {
   createOpsAd,
   createOpsAdSet,
-  createOpsCampaign,
   deleteOpsAd,
   deleteOpsAdSet,
   deleteOpsCampaign,
@@ -16,7 +15,7 @@ import {
   updateOpsCreative,
   updateOpsAd,
   updateOpsAdSet,
-  updateOpsCampaign,
+  saveOpsCampaignSpan,
 } from "@/lib/ops/plan-queries";
 
 function text(formData: FormData, name: string) {
@@ -85,15 +84,22 @@ export async function saveOpsCampaignAction(formData: FormData) {
   await guard();
   const back = backTo(formData);
   const id = text(formData, "id");
-  const input = { name: text(formData, "name"), label: text(formData, "label") };
+  const from = text(formData, "spanFrom");
+  const to = text(formData, "spanTo");
+  const input = { name: text(formData, "name"), label: text(formData, "label"), from: `${from}-01`, to: `${to}-01` };
   try {
-    if (id) await updateOpsCampaign(id, input);
-    else await createOpsCampaign(text(formData, "clientId"), monthDate(text(formData, "view")), input);
+    if (!/^\d{4}-\d{2}$/.test(from) || !/^\d{4}-\d{2}$/.test(to)) throw new Error("Elegí desde qué mes hasta qué mes.");
+    await saveOpsCampaignSpan(text(formData, "clientId"), id, input);
   } catch (error) {
     fail(back, error, "No se pudo guardar la campaña.");
   }
   revalidatePath("/ops/pauta");
-  redirect(`${back}&ok=${encodeURIComponent(id ? "Campaña guardada." : "Campaña creada.")}`);
+  const client = text(formData, "clientSlug") || "gallagro";
+  const view = text(formData, "view");
+  const stay = /^\d{4}-\d{2}$/.test(view) && view >= from && view <= to;
+  const nextView = !id || !stay ? from : view;
+  const next = `/ops/pauta?client=${encodeURIComponent(client)}&view=${encodeURIComponent(nextView)}`;
+  redirect(`${next}&ok=${encodeURIComponent(id ? "Campaña guardada." : "Campaña creada.")}`);
 }
 
 export async function deleteOpsCampaignAction(formData: FormData) {

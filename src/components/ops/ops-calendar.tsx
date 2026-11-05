@@ -482,6 +482,14 @@ function ClientForm({
             Nombre
             <input name="name" required autoFocus className={field} placeholder="Ej. Gallagro" />
           </label>
+          <label className="grid gap-1 text-xs">
+            Cuenta
+            <input name="account" required className={field} placeholder="Ej. 972807331813501" />
+          </label>
+          <label className="grid gap-1 text-xs">
+            Destino
+            <input name="destination" required className={field} placeholder="Ej. WhatsApp" />
+          </label>
           <button type="submit" className="mt-2 w-fit rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
             Crear
           </button>

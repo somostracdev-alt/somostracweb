@@ -42,20 +42,30 @@ async function guard() {
 export async function createOpsClientAction(formData: FormData) {
   await guard();
   const name = text(formData, "name");
+  const account = text(formData, "account");
+  const destination = text(formData, "destination");
   const month = text(formData, "month");
+  const surface = text(formData, "surface");
   const fallback = text(formData, "clientSlug") || "gallagro";
-  const back = month ? `/ops?client=${encodeURIComponent(fallback)}&month=${encodeURIComponent(month)}` : `/ops?client=${encodeURIComponent(fallback)}`;
+  const back = surface === "pauta"
+    ? `/ops/pauta?client=${encodeURIComponent(fallback)}`
+    : month
+      ? `/ops?client=${encodeURIComponent(fallback)}&month=${encodeURIComponent(month)}`
+      : `/ops?client=${encodeURIComponent(fallback)}`;
   let created;
   try {
-    created = await createOpsClient(name);
+    created = await createOpsClient(name, account, destination);
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo crear el cliente.";
     redirect(`${back}&error=${encodeURIComponent(message)}`);
   }
   revalidatePath("/ops");
-  const next = month
-    ? `/ops?client=${encodeURIComponent(created.slug)}&month=${encodeURIComponent(month)}`
-    : `/ops?client=${encodeURIComponent(created.slug)}`;
+  revalidatePath("/ops/pauta");
+  const next = surface === "pauta"
+    ? `/ops/pauta?client=${encodeURIComponent(created.slug)}`
+    : month
+      ? `/ops?client=${encodeURIComponent(created.slug)}&month=${encodeURIComponent(month)}`
+      : `/ops?client=${encodeURIComponent(created.slug)}`;
   redirect(`${next}&ok=${encodeURIComponent("Cliente creado.")}`);
 }
 

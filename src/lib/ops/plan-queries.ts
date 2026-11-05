@@ -29,6 +29,11 @@ export type PlanCampaign = {
   id: string;
   name: string;
   label: string;
+  month: string;
+  monthly: boolean;
+  seriesId: string;
+  spanFrom: string;
+  spanTo: string;
   audience: { zone: string; who: string; exclude: string } | null;
   sets: PlanAdSet[];
 };
@@ -102,7 +107,7 @@ export async function getOpsPlan(clientId: string): Promise<OpsPlan | null> {
   const [months, notes, campaigns, creatives, audiences, sets, ads] = await Promise.all([
     sql`SELECT month, cap_amount FROM ops_plan_months WHERE plan_id = ${planId} ORDER BY month`,
     sql`SELECT id, kind, body, done, sort FROM ops_plan_notes WHERE plan_id = ${planId} ORDER BY kind, sort`,
-    sql`SELECT id, name, label, sort FROM ops_campaigns WHERE plan_id = ${planId} ORDER BY sort, name`,
+    sql`SELECT id, name, label, sort, month, monthly, series_id, span_from, span_to FROM ops_campaigns WHERE plan_id = ${planId} ORDER BY sort, name`,
     sql`
       SELECT id, due_on, due_label, campaign_label, ad_set_name, ad_name,
         image_feed, image_story, video_story, video_feed, copy_text, material, deliver_label
@@ -111,9 +116,9 @@ export async function getOpsPlan(clientId: string): Promise<OpsPlan | null> {
       ORDER BY sort
     `,
     sql`
-      SELECT campaign_id, zone, audience, exclude_note
+      SELECT series_id, zone, audience, exclude_note
       FROM ops_audiences
-      WHERE campaign_id IN (SELECT id FROM ops_campaigns WHERE plan_id = ${planId})
+      WHERE series_id IN (SELECT series_id FROM ops_campaigns WHERE plan_id = ${planId})
     `,
     sql`
       SELECT id, campaign_id, month, name, kind, window_label, message, ads_label,
@@ -171,9 +176,9 @@ export async function getOpsPlan(clientId: string): Promise<OpsPlan | null> {
     setsByCampaign.set(campaignId, list);
   }
 
-  const audienceByCampaign = new Map(
+  const audienceBySeries = new Map(
     audiences.map((row) => [
-      String(row.campaign_id),
+      String(row.series_id),
       {
         zone: String(row.zone ?? ""),
         who: String(row.audience ?? ""),
@@ -201,7 +206,12 @@ export async function getOpsPlan(clientId: string): Promise<OpsPlan | null> {
       id: String(row.id),
       name: String(row.name ?? ""),
       label: String(row.label ?? ""),
-      audience: audienceByCampaign.get(String(row.id)) ?? null,
+      month: asDate(row.month),
+      monthly: Boolean(row.monthly),
+      seriesId: String(row.series_id ?? ""),
+      spanFrom: asDate(row.span_from) || asDate(row.month),
+      spanTo: asDate(row.span_to) || asDate(row.month),
+      audience: audienceBySeries.get(String(row.series_id ?? "")) ?? null,
       sets: setsByCampaign.get(String(row.id)) ?? [],
     })),
     creatives: creatives.map((row) => ({
@@ -244,60 +254,206 @@ async function nextSort(sql: NonNullable<Awaited<ReturnType<typeof ensureOpsSche
   return Number(rows[0]?.sort ?? 0);
 }
 
-export async function createOpsCampaign(clientId: string, month: string, input: { name: string; label: string }) {
+function duplicateCampaign(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  return message.toLowerCase().includes("unique") || message.includes("ops_campaigns");
+}
+
+function monthSpan(from: string, to: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) throw new Error("Elegí desde qué mes hasta qué mes.");
+  if (from > to) throw new Error("El mes hasta tiene que ser el mismo o posterior al desde.");
+  const months: string[] = [];
+  let cursor = from.slice(0, 7);
+  const end = to.slice(0, 7);
+  while (cursor <= end) {
+    months.push(`${cursor}-01`);
+    if (months.length > 36) throw new Error("El rango puede tener hasta 36 meses.");
+    const [year, month] = cursor.split("-").map(Number);
+    const next = new Date(year, month, 1);
+    cursor = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`;
+  }
+  return months;
+}
+
+type CampaignSpan = { name: string; label: string; from: string; to: string };
+
+async function ensurePlanMonth(sql: NonNullable<Awaited<ReturnType<typeof ensureOpsSchema>>>, planId: string, month: string) {
+  await sql`
+    INSERT INTO ops_plan_months (plan_id, month, cap_amount)
+    VALUES (${planId}, ${month}::date, 0)
+    ON CONFLICT (plan_id, month) DO NOTHING
+  `;
+}
+
+async function insertCampaignCopy(
+  sql: NonNullable<Awaited<ReturnType<typeof ensureOpsSchema>>>,
+  planId: string,
+  month: string,
+  seriesId: string,
+  sort: number,
+  input: { name: string; label: string },
+  spanFrom: string,
+  spanTo: string,
+  monthly: boolean,
+) {
+  const created = await sql`
+    INSERT INTO ops_campaigns (plan_id, name, label, sort, month, monthly, series_id, span_from, span_to)
+    VALUES (
+      ${planId}, ${input.name}, ${input.label}, ${sort}, ${month}::date, ${monthly},
+      ${seriesId}::uuid, ${spanFrom}::date, ${spanTo}::date
+    )
+    RETURNING id
+  `;
+  return String(created[0].id);
+}
+
+function monthLength(month: string) {
+  const [year, monthNumber] = month.slice(0, 7).split("-").map(Number);
+  return new Date(year, monthNumber, 0).getDate();
+}
+
+function windowFor(month: string) {
+  const monthNumber = Number(month.slice(5, 7));
+  return `1/${monthNumber} – ${monthLength(month)}/${monthNumber}`;
+}
+
+function nearestSource(byMonth: Map<string, string>, month: string) {
+  let previous = "";
+  let previousId = "";
+  let following = "9999-99-99";
+  let followingId = "";
+  for (const [key, id] of byMonth) {
+    if (key < month && key > previous) {
+      previous = key;
+      previousId = id;
+    }
+    if (key > month && key < following) {
+      following = key;
+      followingId = id;
+    }
+  }
+  if (previousId) return { id: previousId, month: previous };
+  if (followingId) return { id: followingId, month: following };
+  return null;
+}
+
+async function copyContinuingSets(
+  sql: NonNullable<Awaited<ReturnType<typeof ensureOpsSchema>>>,
+  sourceId: string,
+  sourceMonth: string,
+  targetId: string,
+  targetMonth: string,
+) {
+  const sets = await sql`
+    SELECT id, name, kind, window_label, message, ads_label, brands, zone_note, whatsapp, daily_budget, days, sort
+    FROM ops_ad_sets
+    WHERE campaign_id = ${sourceId} AND kind IN ('always_on', 'off')
+    ORDER BY sort, name
+  `;
+  const sourceLength = monthLength(sourceMonth);
+  for (const set of sets) {
+    const days = Number(set.days ?? 0) === sourceLength ? monthLength(targetMonth) : Number(set.days ?? 0);
+    const created = await sql`
+      INSERT INTO ops_ad_sets (
+        campaign_id, month, name, kind, window_label, message, ads_label,
+        brands, zone_note, whatsapp, daily_budget, days, sort
+      ) VALUES (
+        ${targetId}, ${targetMonth}::date, ${String(set.name ?? "")}, ${String(set.kind)}, ${windowFor(targetMonth)},
+        ${String(set.message ?? "")}, ${String(set.ads_label ?? "")}, ${String(set.brands ?? "")},
+        ${String(set.zone_note ?? "")}, ${String(set.whatsapp ?? "")}, ${set.daily_budget}, ${days}, ${Number(set.sort ?? 0)}
+      )
+      RETURNING id
+    `;
+    const setId = String(created[0].id);
+    await sql`
+      INSERT INTO ops_ads (ad_set_id, name, angle, body, prefilled, sort)
+      SELECT ${setId}, name, angle, body, prefilled, sort
+      FROM ops_ads
+      WHERE ad_set_id = ${String(set.id)}
+    `;
+  }
+}
+
+export async function saveOpsCampaignSpan(clientId: string, id: string, input: CampaignSpan) {
   const sql = await ensureOpsSchema();
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
   const label = input.label.trim();
   const name = input.name.trim() || label;
   if (!label) throw new Error("Falta el nombre de la campaña.");
+  const months = monthSpan(input.from, input.to);
+  const monthly = months.length > 1;
+  const fields = { name, label };
 
-  const existing = await sql`SELECT id FROM ops_plans WHERE client_id = ${clientId} ORDER BY created_at LIMIT 1`;
-  let planId = existing[0] ? String(existing[0].id) : "";
+  const existingPlan = await sql`SELECT id FROM ops_plans WHERE client_id = ${clientId} ORDER BY created_at LIMIT 1`;
+  let planId = existingPlan[0] ? String(existingPlan[0].id) : "";
   if (!planId) {
     const created = await sql`
       INSERT INTO ops_plans (client_id, name) VALUES (${clientId}, ${"Pauta"})
       RETURNING id
     `;
     planId = String(created[0].id);
-    await sql`
-      INSERT INTO ops_plan_months (plan_id, month, cap_amount)
-      VALUES (${planId}, ${month}::date, 0)
-    `;
   }
+  for (const month of months) await ensurePlanMonth(sql, planId, month);
 
-  const sort = await nextSort(sql, "ops_campaigns", planId);
   try {
-    await sql`
-      INSERT INTO ops_campaigns (plan_id, name, label, sort)
-      VALUES (${planId}, ${name}, ${label}, ${sort})
-    `;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "";
-    if (message.toLowerCase().includes("unique") || message.includes("ops_campaigns")) {
-      throw new Error("Ya existe una campaña con ese nombre.");
+    if (!id) {
+      const series = await sql`SELECT gen_random_uuid() AS id`;
+      const seriesId = String(series[0].id);
+      const sort = await nextSort(sql, "ops_campaigns", planId);
+      const byMonth = new Map<string, string>();
+      for (const month of months) {
+        const source = nearestSource(byMonth, month);
+        const copyId = await insertCampaignCopy(sql, planId, month, seriesId, sort, fields, input.from, input.to, monthly);
+        if (source) await copyContinuingSets(sql, source.id, source.month, copyId, month);
+        byMonth.set(month, copyId);
+      }
+      return;
     }
+
+    const current = await sql`
+      SELECT series_id, sort FROM ops_campaigns WHERE id = ${id}
+    `;
+    if (!current[0]) throw new Error("No se encontró la campaña.");
+    const seriesId = String(current[0].series_id);
+    const sort = Number(current[0].sort ?? 0);
+    const copies = await sql`
+      SELECT id, month FROM ops_campaigns WHERE series_id = ${seriesId}::uuid
+    `;
+    const byMonth = new Map(copies.map((row) => [asDate(row.month), String(row.id)]));
+    for (const month of months) {
+      const copyId = byMonth.get(month);
+      if (copyId) {
+        await sql`
+          UPDATE ops_campaigns
+          SET name = ${name}, label = ${label}, monthly = ${monthly}, span_from = ${input.from}::date, span_to = ${input.to}::date
+          WHERE id = ${copyId}
+        `;
+      } else {
+        const source = nearestSource(byMonth, month);
+        const copyId = await insertCampaignCopy(sql, planId, month, seriesId, sort, fields, input.from, input.to, monthly);
+        if (source) await copyContinuingSets(sql, source.id, source.month, copyId, month);
+        byMonth.set(month, copyId);
+      }
+    }
+    for (const row of copies) {
+      const month = asDate(row.month);
+      if (!months.includes(month)) await sql`DELETE FROM ops_campaigns WHERE id = ${String(row.id)}`;
+    }
+  } catch (error) {
+    if (duplicateCampaign(error)) throw new Error("Ya existe una campaña con ese nombre en uno de esos meses.");
     throw error;
   }
-}
-
-export async function updateOpsCampaign(id: string, input: { name: string; label: string }) {
-  const sql = await ensureOpsSchema();
-  if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
-  const label = input.label.trim();
-  const name = input.name.trim() || label;
-  if (!label) throw new Error("Falta el nombre de la campaña.");
-  const rows = await sql`
-    UPDATE ops_campaigns SET name = ${name}, label = ${label}
-    WHERE id = ${id}
-    RETURNING id
-  `;
-  if (!rows[0]) throw new Error("No se encontró la campaña.");
 }
 
 export async function deleteOpsCampaign(id: string) {
   const sql = await ensureOpsSchema();
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
+  const current = await sql`SELECT series_id FROM ops_campaigns WHERE id = ${id}`;
+  const seriesId = current[0] ? String(current[0].series_id) : "";
   await sql`DELETE FROM ops_campaigns WHERE id = ${id}`;
+  if (!seriesId) return;
+  const left = await sql`SELECT id FROM ops_campaigns WHERE series_id = ${seriesId}::uuid LIMIT 1`;
+  if (!left[0]) await sql`DELETE FROM ops_audiences WHERE series_id = ${seriesId}::uuid`;
 }
 
 type AdSetInput = {
@@ -318,13 +474,16 @@ export async function createOpsAdSet(campaignId: string, month: string, input: A
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
   if (!input.name.trim()) throw new Error("Falta el nombre del conjunto.");
   assertBudget(input);
+  const owner = await sql`SELECT month FROM ops_campaigns WHERE id = ${campaignId}`;
+  if (!owner[0]) throw new Error("No se encontró la campaña.");
+  const campaignMonth = asDate(owner[0].month) || month;
   const sort = await nextSort(sql, "ops_ad_sets", campaignId);
   await sql`
     INSERT INTO ops_ad_sets (
       campaign_id, month, name, kind, window_label, message, ads_label,
       brands, zone_note, whatsapp, daily_budget, days, sort
     ) VALUES (
-      ${campaignId}, ${month}::date, ${input.name.trim()}, ${input.kind}, ${input.windowLabel},
+      ${campaignId}, ${campaignMonth}::date, ${input.name.trim()}, ${input.kind}, ${input.windowLabel},
       ${input.message}, ${input.adsLabel}, ${input.brands}, ${input.zoneNote}, ${input.whatsapp},
       ${input.dailyBudget}, ${input.days}, ${sort}
     )
@@ -447,10 +606,13 @@ export async function updateOpsCreative(
 export async function saveOpsAudience(campaignId: string, input: { zone: string; who: string; exclude: string }) {
   const sql = await ensureOpsSchema();
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
+  const current = await sql`SELECT series_id FROM ops_campaigns WHERE id = ${campaignId}`;
+  if (!current[0]) throw new Error("No se encontró la campaña.");
+  const seriesId = String(current[0].series_id);
   await sql`
-    INSERT INTO ops_audiences (campaign_id, zone, audience, exclude_note)
-    VALUES (${campaignId}, ${input.zone}, ${input.who}, ${input.exclude})
-    ON CONFLICT (campaign_id) DO UPDATE SET
+    INSERT INTO ops_audiences (series_id, campaign_id, zone, audience, exclude_note)
+    VALUES (${seriesId}::uuid, ${campaignId}, ${input.zone}, ${input.who}, ${input.exclude})
+    ON CONFLICT (series_id) DO UPDATE SET
       zone = EXCLUDED.zone,
       audience = EXCLUDED.audience,
       exclude_note = EXCLUDED.exclude_note
