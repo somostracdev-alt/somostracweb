@@ -9,7 +9,42 @@ let sql: Sql | null = null;
 let ready = false;
 
 export function databaseUrl() {
-  return process.env.DATABASE_URL?.trim() || "";
+  let raw = process.env.DATABASE_URL?.trim() || "";
+  if (
+    (raw.startsWith('"') && raw.endsWith('"')) ||
+    (raw.startsWith("'") && raw.endsWith("'"))
+  ) {
+    raw = raw.slice(1, -1).trim();
+  }
+  if (raw.toLowerCase().startsWith("psql ")) {
+    raw = raw.slice(5).trim();
+    if (
+      (raw.startsWith('"') && raw.endsWith('"')) ||
+      (raw.startsWith("'") && raw.endsWith("'"))
+    ) {
+      raw = raw.slice(1, -1).trim();
+    }
+  }
+  return raw.replace(/\s+/g, "");
+}
+
+export function describeDatabaseUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    const scheme = parsed.protocol.replace(/:$/, "");
+    const user = decodeURIComponent(parsed.username || "");
+    const host = parsed.hostname;
+    const database = decodeURIComponent(parsed.pathname.replace(/^\//, "").replace(/\/$/, ""));
+    const ok =
+      (scheme === "postgres" || scheme === "postgresql") &&
+      Boolean(user) &&
+      Boolean(host) &&
+      host !== "-" &&
+      Boolean(database);
+    return { ok, scheme, user, host, database, pooled: host.includes("-pooler") };
+  } catch {
+    return { ok: false, scheme: "", user: "", host: "", database: "", pooled: false };
+  }
 }
 
 export function getSql() {

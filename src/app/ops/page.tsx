@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 
 import { OpsCalendar } from "@/components/ops/ops-calendar";
-import { databaseUrl } from "@/lib/ops/db";
+import { databaseUrl, describeDatabaseUrl } from "@/lib/ops/db";
 import { getOpsClient, listOpsClients, listOpsLabels, listOpsPieces } from "@/lib/ops/queries";
 
 export const instant = false;
@@ -69,11 +69,21 @@ export default async function OpsPage({ searchParams }: { searchParams: SearchPa
     [labels, pieces] = await Promise.all([listOpsLabels(client.id), listOpsPieces(client.id, from, to)]);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Neon no respondió.";
+    const parsed = describeDatabaseUrl(databaseUrl());
     return (
       <div className="mx-auto max-w-xl px-6 py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Sala de clientes</p>
         <h1 className="mt-2 text-3xl font-semibold">No se pudo cargar el calendario</h1>
         <p className="mt-4 text-sm leading-7 text-[#5c6560]">{message}</p>
+        <p className="mt-4 text-sm leading-7 text-[#5c6560]">
+          En Vercel, <code>DATABASE_URL</code> tiene que ser la connection string completa, sin comillas:
+          empieza con <code>postgresql://</code>, el host termina en <code>neon.tech</code> y al final va{" "}
+          <code>/neondb?sslmode=require</code>. Copiá con el ícono de Neon, no el texto recortado.
+        </p>
+        <p className="mt-3 text-xs leading-6 text-[#6b726c]">
+          Ahora veo scheme={parsed.scheme || "—"}, user={parsed.user || "—"}, host={parsed.host || "—"},
+          database={parsed.database || "—"}.
+        </p>
       </div>
     );
   }
