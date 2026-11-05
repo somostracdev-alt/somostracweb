@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 
+import { OpsPending } from "@/components/ops/ops-pending";
 import { isAdminAuthenticated } from "@/lib/admin-session";
 
 import "./ops.css";
@@ -17,5 +18,9 @@ export default async function OpsLayout({ children }: { children: React.ReactNod
     redirect("/login?next=/ops");
   }
 
-  return <div className="ops-app">{children}</div>;
+  return (
+    <div className="ops-app">
+      <OpsPending>{children}</OpsPending>
+    </div>
+  );
 }

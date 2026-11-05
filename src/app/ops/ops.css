@@ -137,6 +137,102 @@
   border-bottom: 1px dotted #b7bdb6;
 }
 
+.ops-field {
+  position: fixed;
+  z-index: 80;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3.15rem;
+  overflow: hidden;
+  background: #c9a44c;
+  box-shadow: 0 -8px 24px rgba(42, 48, 44, 0.16);
+}
+
+.ops-wheat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: calc(100% + 20px);
+  height: 100%;
+  animation: ops-crop 0.85s linear infinite;
+}
+
+.ops-harvester {
+  position: absolute;
+  bottom: 0;
+  width: 7.4rem;
+  height: 100%;
+  animation: ops-tractor 4.4s linear infinite;
+}
+
+.ops-swath {
+  position: absolute;
+  top: 0;
+  right: 0.5rem;
+  bottom: 0;
+  width: 120vw;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 9px, #7a5e2c 9px 10.5px, transparent 10.5px 18px) bottom / 100% 0.38rem no-repeat,
+    linear-gradient(#ead7a6 0%, #c9a56a 72%, #a88444 100%);
+}
+
+.ops-field-sign {
+  position: absolute;
+  top: 0.22rem;
+  right: 0.7rem;
+  z-index: 2;
+  border-radius: 999px;
+  background: #f3f1eb;
+  padding: 0.15rem 0.55rem;
+  color: #2a302c;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ops-tractor {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 7.4rem;
+  height: auto;
+}
+
+.ops-wheel,
+.ops-reel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ops-spin 0.7s linear infinite;
+}
+
+.ops-wheel {
+  animation-duration: 0.38s;
+}
+
+@keyframes ops-crop {
+  to {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes ops-tractor {
+  from {
+    left: -8.5rem;
+  }
+  to {
+    left: calc(100% + 1rem);
+  }
+}
+
+@keyframes ops-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .ops-modal {
   width: min(36rem, calc(100vw - 1.5rem));
   max-height: min(90vh, 46rem);

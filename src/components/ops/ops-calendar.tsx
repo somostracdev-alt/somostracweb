@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createOpsClientAction, deleteOpsPieceAction, saveOpsPieceAction } from "@/app/ops/actions";
+import { useOpsPending } from "@/components/ops/ops-pending";
 import { OpsSwitch } from "@/components/ops/ops-switch";
 import { labelTone } from "@/lib/ops/labels";
 import type { OpsClient, OpsLabelRow, OpsPiece } from "@/lib/ops/queries";
@@ -92,6 +93,7 @@ export function OpsCalendar({
   notice?: { ok?: string; error?: string };
 }) {
   const router = useRouter();
+  const startPending = useOpsPending();
   const [filter, setFilter] = useState("");
   const [viewing, setViewing] = useState<OpsPiece | null>(null);
   const [open, setOpen] = useState<OpsPiece | null>(null);
@@ -169,7 +171,10 @@ export function OpsCalendar({
             </span>
             <select
               value={client.slug}
-              onChange={(event) => router.push(href(month, event.target.value))}
+              onChange={(event) => {
+                startPending();
+                router.push(href(month, event.target.value));
+              }}
               className="w-full rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm sm:w-auto"
             >
               {clients.map((item) => (

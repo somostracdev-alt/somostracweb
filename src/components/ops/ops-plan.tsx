@@ -15,6 +15,7 @@ import {
   toggleOpsPlanNoteAction,
 } from "@/app/ops/pauta/actions";
 import { OpsSwitch } from "@/components/ops/ops-switch";
+import { useOpsPending } from "@/components/ops/ops-pending";
 import type { OpsPlan, PlanAd, PlanAdSet, PlanCampaign, PlanCreative } from "@/lib/ops/plan-queries";
 import type { OpsClient } from "@/lib/ops/queries";
 
@@ -166,6 +167,7 @@ export function OpsPlanView({
   notice?: { ok?: string; error?: string };
 }) {
   const router = useRouter();
+  const startPending = useOpsPending();
   const [peek, setPeek] = useState<Peek>(null);
   const [editor, setEditor] = useState<Editor>(null);
   const href = (nextView: string, nextClient = client.slug) =>
@@ -197,7 +199,10 @@ export function OpsPlanView({
             <span className="mb-1 sm:absolute sm:bottom-full sm:left-0 sm:mb-1">Cliente</span>
             <select
               value={client.slug}
-              onChange={(event) => router.push(href(view, event.target.value))}
+              onChange={(event) => {
+                startPending();
+                router.push(href(view, event.target.value));
+              }}
               className="w-full rounded-xl border border-[#cfd4cc] bg-[#f3f1eb] px-3 py-2 text-sm sm:w-auto"
             >
               {clients.map((item) => (
@@ -240,7 +245,11 @@ export function OpsPlanView({
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => router.push(href(tab.id))}
+                onClick={() => {
+                  if (view === tab.id) return;
+                  startPending();
+                  router.push(href(tab.id));
+                }}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${
                   view === tab.id ? "bg-[#2a302c] text-[#f7f5f0]" : "border border-[#cfd4cc] bg-[#f3f1eb]"
                 }`}
