@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 
 import { AdminNav } from "@/components/admin-nav";
@@ -10,6 +11,7 @@ export const metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await connection();
   if (!(await isAdminAuthenticated())) {
     redirect("/login?error=" + encodeURIComponent("Sesión de admin no válida"));
   }

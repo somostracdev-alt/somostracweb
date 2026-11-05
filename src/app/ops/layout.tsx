@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 
 import { isAdminAuthenticated } from "@/lib/admin-session";
@@ -11,6 +12,7 @@ export const metadata = {
 };
 
 export default async function OpsLayout({ children }: { children: React.ReactNode }) {
+  await connection();
   if (!(await isAdminAuthenticated())) {
     redirect("/login?next=/ops");
   }

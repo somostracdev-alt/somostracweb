@@ -46,25 +46,37 @@ export default async function OpsPage({ searchParams }: { searchParams: SearchPa
     );
   }
 
-  const clients = await listOpsClients();
-  const client = (await getOpsClient(params.client ?? "gallagro")) ?? clients[0];
-  if (!client) {
+  let clients;
+  let client;
+  let labels;
+  let pieces;
+  try {
+    clients = await listOpsClients();
+    client = (await getOpsClient(params.client ?? "gallagro")) ?? clients[0];
+    if (!client) {
+      return (
+        <div className="mx-auto max-w-xl px-6 py-16">
+          <h1 className="text-3xl font-semibold">No hay clientes</h1>
+          <p className="mt-4 text-sm text-[#5c6560]">Neon respondió, pero no se pudo crear Gallagro.</p>
+        </div>
+      );
+    }
+
+    const { start, end } = monthBounds(month);
+    const today = new Date().toISOString().slice(0, 10);
+    const from = start < today ? start : today;
+    const to = end > addDays(today, 13) ? end : addDays(today, 13);
+    [labels, pieces] = await Promise.all([listOpsLabels(client.id), listOpsPieces(client.id, from, to)]);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Neon no respondió.";
     return (
       <div className="mx-auto max-w-xl px-6 py-16">
-        <h1 className="text-3xl font-semibold">No hay clientes</h1>
-        <p className="mt-4 text-sm text-[#5c6560]">Neon respondió, pero no se pudo crear Gallagro.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6b726c]">Sala de clientes</p>
+        <h1 className="mt-2 text-3xl font-semibold">No se pudo cargar el calendario</h1>
+        <p className="mt-4 text-sm leading-7 text-[#5c6560]">{message}</p>
       </div>
     );
   }
-
-  const { start, end } = monthBounds(month);
-  const today = new Date().toISOString().slice(0, 10);
-  const from = start < today ? start : today;
-  const to = end > addDays(today, 13) ? end : addDays(today, 13);
-  const [labels, pieces] = await Promise.all([
-    listOpsLabels(client.id),
-    listOpsPieces(client.id, from, to),
-  ]);
 
   return (
     <OpsCalendar
