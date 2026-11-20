@@ -17,32 +17,23 @@ function Icon({ id }: { id: SocialLink["id"] }) {
 }
 
 export function SocialLinks({ links }: { links: SocialLink[] }) {
-  if (links.length === 0) return null;
+  const visible = links.filter((link) => link.href.trim());
+  if (visible.length === 0) return null;
 
   return (
     <div className="flex items-center gap-4">
-      {links.map((link) => {
-        const className = "text-foreground transition-colors hover:text-accent";
-        if (!link.href.trim()) {
-          return (
-            <span key={link.id} aria-label={link.label} className={className}>
-              <Icon id={link.id} />
-            </span>
-          );
-        }
-        return (
-          <a
-            key={link.id}
-            href={link.href}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={link.label}
-            className={className}
-          >
-            <Icon id={link.id} />
-          </a>
-        );
-      })}
+      {visible.map((link) => (
+        <a
+          key={link.id}
+          href={link.href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={link.label}
+          className="text-foreground transition-colors hover:text-accent"
+        >
+          <Icon id={link.id} />
+        </a>
+      ))}
     </div>
   );
 }

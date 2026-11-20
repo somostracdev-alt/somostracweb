@@ -1,4 +1,4 @@
-import { AdminCard, AdminFlash, AdminForm, Field, ImageField, SaveButton } from "@/components/admin-form";
+import { AdminCard, AdminFlash, AdminForm, Area, Field, ImageField, SaveButton } from "@/components/admin-form";
 import { getSiteContent } from "@/content/site";
 
 import { saveSiteChromeAction } from "../actions";
@@ -31,6 +31,7 @@ export default async function AdminSitePage({ searchParams }: { searchParams: Se
           ))}
         </AdminCard>
         <AdminCard title="Footer">
+          <Area label="Texto bajo el logo" name="summary" defaultValue={site.footer.summary} rows={3} />
           <Field label="Tagline" name="tagline" defaultValue={site.footer.tagline} />
           <Field label="Título de links" name="linksTitle" defaultValue={site.footer.linksTitle} />
           <Field label="Título de contacto" name="contactTitle" defaultValue={site.footer.contactTitle} />

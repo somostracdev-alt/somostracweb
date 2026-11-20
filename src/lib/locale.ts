@@ -7,9 +7,17 @@ export const uiCopy = {
   es: {
     login: "Login",
     formKicker: "Formulario de consulta",
-    formSent: "Se abrió WhatsApp con tu mensaje. Si no lo ves, revisá que el navegador no haya bloqueado la ventana.",
-    formMessage: (nombre: string, email: string, telefono: string, mensaje: string) =>
-      `Hola TRAC, soy ${nombre}.\nEmail: ${email}\nTeléfono: ${telefono}\n\n${mensaje}`,
+    formSent: "¡Gracias! Recibimos tu consulta y te escribimos en menos de 24 horas.",
+    formMessage: (fields: {
+      nombre: string;
+      empresa: string;
+      rubro: string;
+      whatsapp: string;
+      email: string;
+      zona: string;
+      mensaje: string;
+    }) =>
+      `Hola TRAC, soy ${fields.nombre} de ${fields.empresa}.\nRubro: ${fields.rubro}\nWhatsApp: ${fields.whatsapp}\nEmail: ${fields.email}${fields.zona ? `\nZona: ${fields.zona}` : ""}${fields.mensaje ? `\n\n${fields.mensaje}` : ""}`,
     waGreeting: "Hola! Quiero potenciar mi negocio con TRAC",
     waBubble: "Escribinos. Pedimos el rubro y cómo está armada la comercial, y respondemos por acá.",
     waOpen: "Abrir WhatsApp",
@@ -34,9 +42,17 @@ export const uiCopy = {
   en: {
     login: "Login",
     formKicker: "Inquiry form",
-    formSent: "WhatsApp opened with your message. If you don't see it, check that the browser didn't block the window.",
-    formMessage: (nombre: string, email: string, telefono: string, mensaje: string) =>
-      `Hi TRAC, this is ${nombre}.\nEmail: ${email}\nPhone: ${telefono}\n\n${mensaje}`,
+    formSent: "Thank you! We received your inquiry and we'll write within 24 hours.",
+    formMessage: (fields: {
+      nombre: string;
+      empresa: string;
+      rubro: string;
+      whatsapp: string;
+      email: string;
+      zona: string;
+      mensaje: string;
+    }) =>
+      `Hi TRAC, this is ${fields.nombre} from ${fields.empresa}.\nLine of business: ${fields.rubro}\nWhatsApp: ${fields.whatsapp}\nEmail: ${fields.email}${fields.zona ? `\nArea: ${fields.zona}` : ""}${fields.mensaje ? `\n\n${fields.mensaje}` : ""}`,
     waGreeting: "Hi! I want to strengthen my dealership with TRAC",
     waBubble: "Write to us. Tell us the line of business and how sales are set up today. We'll reply here.",
     waOpen: "Open WhatsApp",

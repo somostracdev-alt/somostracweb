@@ -9,7 +9,7 @@ export const instant = false;
 
 export default async function AdminHomePage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const { hero, install, system, why } = (await getSiteContent("es")).home;
+  const { hero, install, system, sectors, why, close } = (await getSiteContent("es")).home;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-10">
@@ -38,10 +38,14 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Se
             hint="Uno por línea."
           />
           <ImageField label="Imagen del hero" name="heroImage" current={hero.image} />
+          <Field label="Botón principal" name="primaryLabel" defaultValue={hero.primaryLabel} />
+          <Field label="Enlace del botón principal" name="primaryHref" defaultValue={hero.primaryHref} />
+          <Field label="Botón de WhatsApp" name="secondaryLabel" defaultValue={hero.secondaryLabel} />
         </AdminCard>
         <AdminCard title="Instalamos sistema comercial">
           <Field label="Título" name="installTitle" defaultValue={install.title} />
           <Area label="Párrafos" name="installParagraphs" defaultValue={install.paragraphs.join("\n")} hint="Uno por línea." />
+          <Area label="Etapas" name="installStages" defaultValue={install.stages.join("\n")} hint="Una por línea. Se ven en verde debajo del texto." />
           <Field label="Botón" name="installCtaLabel" defaultValue={install.ctaLabel} />
           <Field label="Enlace del botón" name="installCtaHref" defaultValue={install.ctaHref} />
         </AdminCard>
@@ -54,6 +58,22 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Se
         <AdminCard title="Por qué TRAC">
           <Field label="Título" name="whyTitle" defaultValue={why.title} />
           <Area label="Párrafos" name="whyParagraphs" defaultValue={why.paragraphs.join("\n")} hint="Uno por línea." />
+          <Field label="Dato" name="statValue" defaultValue={why.statValue} />
+          <Area label="Texto del dato" name="statText" defaultValue={why.statText} rows={3} />
+          <Field label="Fuente" name="statSource" defaultValue={why.statSource} />
+          <Field label="Botón" name="whyCtaLabel" defaultValue={why.ctaLabel} />
+          <Field label="Enlace del botón" name="whyCtaHref" defaultValue={why.ctaHref} />
+        </AdminCard>
+        <AdminCard title="Con quién trabajamos">
+          <Field label="Título" name="sectorsTitle" defaultValue={sectors.title} />
+          <Area label="Bloques" name="sectorsItems" defaultValue={sectors.items.join("\n")} hint="Uno por línea." />
+          <Area label="Cierre" name="sectorsClose" defaultValue={sectors.close} rows={3} />
+        </AdminCard>
+        <AdminCard title="Cierre de la home">
+          <Field label="Título" name="closeTitle" defaultValue={close.title} />
+          <Area label="Texto" name="closeText" defaultValue={close.text} rows={3} />
+          <Field label="Botón" name="closeLabel" defaultValue={close.ctaLabel} />
+          <Field label="Enlace del botón" name="closeHref" defaultValue={close.ctaHref} />
         </AdminCard>
         <SaveButton />
       </AdminForm>

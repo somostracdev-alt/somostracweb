@@ -52,20 +52,12 @@ export function SiteFooter({
   site,
   languageSwitch,
   loginLabel,
-  whatsapp,
+  whatsappLabel,
 }: {
   site: SiteContent;
   languageSwitch: React.ReactNode;
   loginLabel: string;
-  whatsapp: {
-    greeting: string;
-    bubble: string;
-    open: string;
-    close: string;
-    label: string;
-    role: string;
-    messageLabel: string;
-  };
+  whatsappLabel: string;
 }) {
   const compact = useCompactFooter("site-footer");
   const about = site.navigation.find((link) => link.id === "quienes") ?? {
@@ -78,21 +70,31 @@ export function SiteFooter({
     <>
       <footer id="site-footer" className="border-t border-line bg-background">
         <div className="grid gap-12 py-16 md:grid-cols-3 md:gap-16 md:py-20">
-          <p className="max-w-xs font-display text-2xl uppercase leading-tight tracking-[0.04em] md:text-[1.75rem]">
-            {site.footer.tagline}
-          </p>
+          <div>
+            <Image
+              src={site.brand.logo}
+              alt={site.brand.name}
+              width={482}
+              height={128}
+              className="brand-logo h-9 w-auto"
+            />
+            <p className="mt-6 max-w-xs text-sm leading-7 text-muted">{site.footer.summary}</p>
+            <p className="mt-6 font-display text-xl uppercase leading-tight tracking-[0.04em]">
+              {site.footer.tagline}
+            </p>
+          </div>
           <div>
             <p className="page-kicker">{site.footer.linksTitle}</p>
             <ul className="space-y-3">
               {site.footer.links.map((link) => (
                 <li key={link.id}>
-                  <Link href={link.href} className="font-light transition-colors hover:text-accent">
+                  <Link href={link.href} className="font-normal transition-colors hover:text-accent">
                     {link.label}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/login" className="font-light transition-colors hover:text-accent">
+                <Link href="/login" className="font-normal transition-colors hover:text-accent">
                   {loginLabel}
                 </Link>
               </li>
@@ -100,17 +102,36 @@ export function SiteFooter({
           </div>
           <div>
             <p className="page-kicker">{site.footer.contactTitle}</p>
-            <ul className="space-y-3 font-light">
+            <ul className="space-y-3 font-normal">
               <li>
                 <a href={`mailto:${site.contact.email}`} className="transition-colors hover:text-accent">
                   {site.contact.email}
                 </a>
               </li>
               <li>
-                <a href={site.contact.whatsappHref} className="transition-colors hover:text-accent">
+                <a
+                  href={site.contact.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-accent"
+                >
                   {site.contact.phoneDisplay}
                 </a>
               </li>
+              {site.social
+                .filter((link) => link.href.trim())
+                .map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="transition-colors hover:text-accent"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
             </ul>
             <div className="mt-8">
               <SocialLinks links={site.social} />
@@ -118,7 +139,7 @@ export function SiteFooter({
             <div className="mt-10">{languageSwitch}</div>
           </div>
         </div>
-        <p className="border-t border-line py-6 text-center text-sm font-light text-muted">
+        <p className="border-t border-line py-6 text-center text-sm font-normal text-muted">
           {site.footer.copyright}
         </p>
       </footer>
@@ -142,7 +163,7 @@ export function SiteFooter({
           </Link>
           <Link
             href={about.href}
-            className="truncate font-sans text-xs font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-accent sm:text-sm"
+            className="truncate font-sans text-xs font-normal text-foreground transition-colors hover:text-accent sm:text-sm"
           >
             {about.label}
           </Link>
@@ -150,7 +171,7 @@ export function SiteFooter({
         </div>
       </div>
 
-      <WhatsAppButton href={site.contact.whatsappHref} lifted={compact} copy={whatsapp} />
+      <WhatsAppButton href={site.contact.whatsappHref} lifted={compact} label={whatsappLabel} />
     </>
   );
 }

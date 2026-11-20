@@ -1,4 +1,4 @@
-import { AdminCard, AdminFlash, Field, SaveButton } from "@/components/admin-form";
+import { AdminCard, AdminFlash, Area, Field, SaveButton } from "@/components/admin-form";
 import { getSiteContent } from "@/content/site";
 
 import { saveContactAction } from "../actions";
@@ -31,13 +31,26 @@ export default async function AdminContactPage({ searchParams }: { searchParams:
           <Field label="Instagram" name="instagram" defaultValue={instagram} />
           <Field label="LinkedIn" name="linkedin" defaultValue={linkedin} />
         </AdminCard>
-        <AdminCard title="Formulario">
+        <AdminCard title="Página">
           <Field label="Título de la página" name="title" defaultValue={site.contactPage.title} />
+          <Area label="Texto de entrada" name="intro" defaultValue={site.contactPage.intro} rows={4} />
+          <Field label="Título de los pasos" name="stepsTitle" defaultValue={site.contactPage.stepsTitle} />
+          <Area label="Pasos" name="steps" defaultValue={site.contactPage.steps.join("\n")} hint="Uno por línea." />
+          <Field label="Botón de WhatsApp" name="whatsappButton" defaultValue={site.contactPage.whatsappButton} />
+        </AdminCard>
+        <AdminCard title="Formulario">
           <Field label="Etiqueta nombre" name="nameLabel" defaultValue={site.contactPage.nameLabel} />
+          <Field label="Etiqueta empresa" name="companyLabel" defaultValue={site.contactPage.companyLabel} />
+          <Field label="Etiqueta rubro" name="sectorLabel" defaultValue={site.contactPage.sectorLabel} />
+          <Area label="Opciones de rubro" name="sectors" defaultValue={site.contactPage.sectors.join("\n")} hint="Una por línea." />
+          <Field label="Etiqueta WhatsApp" name="whatsappLabel" defaultValue={site.contactPage.whatsappLabel} />
           <Field label="Etiqueta email" name="emailLabel" defaultValue={site.contactPage.emailLabel} />
-          <Field label="Etiqueta teléfono" name="phoneLabel" defaultValue={site.contactPage.phoneLabel} />
+          <Field label="Etiqueta zona" name="zoneLabel" defaultValue={site.contactPage.zoneLabel} />
           <Field label="Etiqueta mensaje" name="messageLabel" defaultValue={site.contactPage.messageLabel} />
+          <Area label="Texto guía del mensaje" name="messagePlaceholder" defaultValue={site.contactPage.messagePlaceholder} rows={2} />
           <Field label="Botón enviar" name="submitLabel" defaultValue={site.contactPage.submitLabel} />
+          <Area label="Aviso de privacidad" name="privacy" defaultValue={site.contactPage.privacy} rows={2} />
+          <Area label="Confirmación" name="success" defaultValue={site.contactPage.success} rows={2} />
         </AdminCard>
         <SaveButton />
       </form>

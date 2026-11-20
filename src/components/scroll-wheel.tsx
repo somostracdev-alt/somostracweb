@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 const DEGREES_PER_PIXEL = 0.08;
 
-export function ScrollWheel({ src }: { src: string }) {
+export function ScrollWheel({ src, className = "" }: { src: string; className?: string }) {
   const wheelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function ScrollWheel({ src }: { src: string }) {
   }, []);
 
   return (
-    <div className="relative min-h-[280px] md:min-h-[460px]">
+    <div className={`relative min-h-[220px] md:min-h-[280px] ${className}`}>
       <div ref={wheelRef} className="absolute inset-0 will-change-transform">
         <Image
           src={src}

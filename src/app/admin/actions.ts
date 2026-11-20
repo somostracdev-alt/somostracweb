@@ -70,12 +70,24 @@ export async function saveContactAction(formData: FormData) {
       if (link.id === "linkedin") return { ...link, href: text(formData, "linkedin") };
       return link;
     });
-    content.contactPage.title = text(formData, "title");
-    content.contactPage.nameLabel = text(formData, "nameLabel");
-    content.contactPage.emailLabel = text(formData, "emailLabel");
-    content.contactPage.phoneLabel = text(formData, "phoneLabel");
-    content.contactPage.messageLabel = text(formData, "messageLabel");
-    content.contactPage.submitLabel = text(formData, "submitLabel");
+    const page = content.contactPage;
+    page.title = text(formData, "title");
+    page.intro = text(formData, "intro");
+    page.stepsTitle = text(formData, "stepsTitle");
+    page.steps = lines(formData, "steps");
+    page.whatsappButton = text(formData, "whatsappButton");
+    page.nameLabel = text(formData, "nameLabel");
+    page.companyLabel = text(formData, "companyLabel");
+    page.sectorLabel = text(formData, "sectorLabel");
+    page.sectors = lines(formData, "sectors");
+    page.whatsappLabel = text(formData, "whatsappLabel");
+    page.emailLabel = text(formData, "emailLabel");
+    page.zoneLabel = text(formData, "zoneLabel");
+    page.messageLabel = text(formData, "messageLabel");
+    page.messagePlaceholder = text(formData, "messagePlaceholder");
+    page.submitLabel = text(formData, "submitLabel");
+    page.privacy = text(formData, "privacy");
+    page.success = text(formData, "success");
   });
 }
 
@@ -87,9 +99,13 @@ export async function saveHomeAction(formData: FormData) {
     hero.subtitle = text(formData, "subtitle");
     hero.paragraphs = lines(formData, "heroParagraphs");
     hero.image = await imageValue(formData, "heroImage", hero.image);
+    hero.primaryLabel = text(formData, "primaryLabel");
+    hero.primaryHref = text(formData, "primaryHref") || "/contacto";
+    hero.secondaryLabel = text(formData, "secondaryLabel");
 
     content.home.install.title = text(formData, "installTitle");
     content.home.install.paragraphs = lines(formData, "installParagraphs");
+    content.home.install.stages = lines(formData, "installStages");
     content.home.install.ctaLabel = text(formData, "installCtaLabel");
     content.home.install.ctaHref = text(formData, "installCtaHref") || "/contacto";
 
@@ -98,8 +114,22 @@ export async function saveHomeAction(formData: FormData) {
     content.home.system.ctaLabel = text(formData, "systemCtaLabel");
     content.home.system.ctaHref = text(formData, "systemCtaHref") || "/servicios";
 
+    content.home.sectors.title = text(formData, "sectorsTitle");
+    content.home.sectors.items = lines(formData, "sectorsItems");
+    content.home.sectors.close = text(formData, "sectorsClose");
+
     content.home.why.title = text(formData, "whyTitle");
     content.home.why.paragraphs = lines(formData, "whyParagraphs");
+    content.home.why.statValue = text(formData, "statValue");
+    content.home.why.statText = text(formData, "statText");
+    content.home.why.statSource = text(formData, "statSource");
+    content.home.why.ctaLabel = text(formData, "whyCtaLabel");
+    content.home.why.ctaHref = text(formData, "whyCtaHref") || "/contacto";
+
+    content.home.close.title = text(formData, "closeTitle");
+    content.home.close.text = text(formData, "closeText");
+    content.home.close.ctaLabel = text(formData, "closeLabel");
+    content.home.close.ctaHref = text(formData, "closeHref") || "/contacto";
   });
 }
 
@@ -109,6 +139,21 @@ export async function saveAboutAction(formData: FormData) {
     content.about.paragraphs = lines(formData, "paragraphs");
     content.about.storyTitle = text(formData, "storyTitle");
     content.about.storyParagraphs = lines(formData, "storyParagraphs");
+    content.about.principlesTitle = text(formData, "principlesTitle");
+    content.about.principles = content.about.principles.map((item, index) => ({
+      title: text(formData, `principleTitle-${index}`) || item.title,
+      text: text(formData, `principleText-${index}`) || item.text,
+    }));
+    content.about.teamTitle = text(formData, "teamTitle");
+    content.about.team = content.about.team.map((item, index) => ({
+      title: text(formData, `teamTitle-${index}`) || item.title,
+      text: text(formData, `teamText-${index}`) || item.text,
+    }));
+    content.about.teamNote = text(formData, "teamNote");
+    content.about.closeTitle = text(formData, "closeTitle");
+    content.about.closeText = text(formData, "closeText");
+    content.about.closeLabel = text(formData, "closeLabel");
+    content.about.closeHref = text(formData, "closeHref") || "/contacto";
   });
 }
 
@@ -120,11 +165,18 @@ export async function saveServicesAction(formData: FormData) {
       content.services.items.map(async (item) => ({
         ...item,
         title: text(formData, `${item.id}Title`),
-        paragraphs: lines(formData, `${item.id}Paragraphs`),
+        summary: text(formData, `${item.id}Summary`),
+        lead: text(formData, `${item.id}Lead`),
+        points: lines(formData, `${item.id}Points`),
+        closing: text(formData, `${item.id}Closing`),
         icon: await imageValue(formData, `${item.id}Icon`, item.icon),
         image: await imageValue(formData, `${item.id}Image`, item.image),
       })),
     );
+    content.services.closeTitle = text(formData, "closeTitle");
+    content.services.closeText = text(formData, "closeText");
+    content.services.closeLabel = text(formData, "closeLabel");
+    content.services.closeHref = text(formData, "closeHref") || "/contacto";
   });
 }
 
@@ -136,6 +188,7 @@ export async function saveSiteChromeAction(formData: FormData) {
       ...link,
       label: text(formData, `nav-${link.id}`) || link.label,
     }));
+    content.footer.summary = text(formData, "summary");
     content.footer.tagline = text(formData, "tagline");
     content.footer.linksTitle = text(formData, "linksTitle");
     content.footer.contactTitle = text(formData, "contactTitle");

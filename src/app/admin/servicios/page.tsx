@@ -28,11 +28,20 @@ export default async function AdminServicesPage({ searchParams }: { searchParams
         {services.items.map((item) => (
           <AdminCard key={item.id} title={item.title}>
             <Field label="Título" name={`${item.id}Title`} defaultValue={item.title} />
-            <Area label="Párrafos" name={`${item.id}Paragraphs`} defaultValue={item.paragraphs.join("\n")} />
+            <Area label="Texto en la home" name={`${item.id}Summary`} defaultValue={item.summary} rows={3} />
+            <Area label="Frase de apertura" name={`${item.id}Lead`} defaultValue={item.lead} rows={2} />
+            <Area label="Puntos" name={`${item.id}Points`} defaultValue={item.points.join("\n")} hint="Uno por línea." />
+            <Area label="Cierre" name={`${item.id}Closing`} defaultValue={item.closing} rows={2} />
             <ImageField label="Ícono" name={`${item.id}Icon`} current={item.icon} />
             <ImageField label="Imagen" name={`${item.id}Image`} current={item.image} wide />
           </AdminCard>
         ))}
+        <AdminCard title="Cierre">
+          <Field label="Título" name="closeTitle" defaultValue={services.closeTitle} />
+          <Area label="Texto" name="closeText" defaultValue={services.closeText} rows={3} />
+          <Field label="Botón" name="closeLabel" defaultValue={services.closeLabel} />
+          <Field label="Enlace del botón" name="closeHref" defaultValue={services.closeHref} />
+        </AdminCard>
         <SaveButton />
       </AdminForm>
     </div>

@@ -6,7 +6,9 @@ import { cache } from "react";
 
 import { englishSiteContent } from "@/content/en";
 import {
+  contentRevision,
   defaultSiteContent,
+  type CopyBlock,
   type ServiceItem,
   type SiteContent,
   type SiteLink,
@@ -89,6 +91,19 @@ function asSocial(value: unknown, fallback: SocialLink[]) {
   });
 }
 
+function asBlocks(value: unknown, fallback: CopyBlock[]) {
+  if (!Array.isArray(value)) return fallback;
+  return fallback.map((block, index) => {
+    const found = value[index];
+    if (!found || typeof found !== "object") return block;
+    const entry = found as Partial<CopyBlock>;
+    return {
+      title: asString(entry.title, block.title),
+      text: asString(entry.text, block.text),
+    };
+  });
+}
+
 function asServices(value: unknown, fallback: ServiceItem[]) {
   if (!Array.isArray(value)) return fallback;
   return fallback.map((item) => {
@@ -99,11 +114,20 @@ function asServices(value: unknown, fallback: ServiceItem[]) {
     return {
       ...item,
       title: asString(found.title, item.title),
+      summary: asString(found.summary, item.summary),
+      lead: asString(found.lead, item.lead),
+      points: asLines(found.points, item.points),
+      closing: asString(found.closing, item.closing),
       icon: asString(found.icon, item.icon),
       image: asString(found.image, item.image),
-      paragraphs: asLines(found.paragraphs, item.paragraphs),
     };
   });
+}
+
+function revisionOf(saved: unknown) {
+  if (!saved || typeof saved !== "object") return 0;
+  const value = (saved as { revision?: unknown }).revision;
+  return typeof value === "number" ? value : 0;
 }
 
 function mergeSiteContent(saved: unknown): SiteContent {
@@ -121,20 +145,34 @@ function mergeSiteContent(saved: unknown): SiteContent {
   base.contact.phoneHref = asString(data.contact?.phoneHref, base.contact.phoneHref);
   base.contact.whatsappHref = asString(data.contact?.whatsappHref, base.contact.whatsappHref);
 
+  base.footer.summary = asString(data.footer?.summary, base.footer.summary);
   base.footer.tagline = asString(data.footer?.tagline, base.footer.tagline);
   base.footer.linksTitle = asString(data.footer?.linksTitle, base.footer.linksTitle);
   base.footer.contactTitle = asString(data.footer?.contactTitle, base.footer.contactTitle);
   base.footer.copyright = asString(data.footer?.copyright, base.footer.copyright);
   base.footer.links = asLinks(data.footer?.links, base.footer.links);
 
+  base.seo.homeTitle = asString(data.seo?.homeTitle, base.seo.homeTitle);
+  base.seo.homeDescription = asString(data.seo?.homeDescription, base.seo.homeDescription);
+  base.seo.aboutTitle = asString(data.seo?.aboutTitle, base.seo.aboutTitle);
+  base.seo.aboutDescription = asString(data.seo?.aboutDescription, base.seo.aboutDescription);
+  base.seo.servicesTitle = asString(data.seo?.servicesTitle, base.seo.servicesTitle);
+  base.seo.servicesDescription = asString(data.seo?.servicesDescription, base.seo.servicesDescription);
+  base.seo.contactTitle = asString(data.seo?.contactTitle, base.seo.contactTitle);
+  base.seo.contactDescription = asString(data.seo?.contactDescription, base.seo.contactDescription);
+
   base.home.hero.prefix = asString(data.home?.hero?.prefix, base.home.hero.prefix);
   base.home.hero.rotating = asLines(data.home?.hero?.rotating, base.home.hero.rotating);
   base.home.hero.subtitle = asString(data.home?.hero?.subtitle, base.home.hero.subtitle);
   base.home.hero.paragraphs = asLines(data.home?.hero?.paragraphs, base.home.hero.paragraphs);
   base.home.hero.image = asString(data.home?.hero?.image, base.home.hero.image);
+  base.home.hero.primaryLabel = asString(data.home?.hero?.primaryLabel, base.home.hero.primaryLabel);
+  base.home.hero.primaryHref = asString(data.home?.hero?.primaryHref, base.home.hero.primaryHref);
+  base.home.hero.secondaryLabel = asString(data.home?.hero?.secondaryLabel, base.home.hero.secondaryLabel);
 
   base.home.install.title = asString(data.home?.install?.title, base.home.install.title);
   base.home.install.paragraphs = asLines(data.home?.install?.paragraphs, base.home.install.paragraphs);
+  base.home.install.stages = asLines(data.home?.install?.stages, base.home.install.stages);
   base.home.install.ctaLabel = asString(data.home?.install?.ctaLabel, base.home.install.ctaLabel);
   base.home.install.ctaHref = asString(data.home?.install?.ctaHref, base.home.install.ctaHref);
 
@@ -143,25 +181,65 @@ function mergeSiteContent(saved: unknown): SiteContent {
   base.home.system.ctaLabel = asString(data.home?.system?.ctaLabel, base.home.system.ctaLabel);
   base.home.system.ctaHref = asString(data.home?.system?.ctaHref, base.home.system.ctaHref);
 
+  base.home.sectors.title = asString(data.home?.sectors?.title, base.home.sectors.title);
+  base.home.sectors.items = asLines(data.home?.sectors?.items, base.home.sectors.items);
+  base.home.sectors.close = asString(data.home?.sectors?.close, base.home.sectors.close);
+
   base.home.why.title = asString(data.home?.why?.title, base.home.why.title);
   base.home.why.paragraphs = asLines(data.home?.why?.paragraphs, base.home.why.paragraphs);
+  base.home.why.statValue = asString(data.home?.why?.statValue, base.home.why.statValue);
+  base.home.why.statText = asString(data.home?.why?.statText, base.home.why.statText);
+  base.home.why.statSource = asString(data.home?.why?.statSource, base.home.why.statSource);
+  base.home.why.ctaLabel = asString(data.home?.why?.ctaLabel, base.home.why.ctaLabel);
+  base.home.why.ctaHref = asString(data.home?.why?.ctaHref, base.home.why.ctaHref);
+
+  base.home.close.title = asString(data.home?.close?.title, base.home.close.title);
+  base.home.close.text = asString(data.home?.close?.text, base.home.close.text);
+  base.home.close.ctaLabel = asString(data.home?.close?.ctaLabel, base.home.close.ctaLabel);
+  base.home.close.ctaHref = asString(data.home?.close?.ctaHref, base.home.close.ctaHref);
 
   base.about.title = asString(data.about?.title, base.about.title);
   base.about.paragraphs = asLines(data.about?.paragraphs, base.about.paragraphs);
   base.about.storyTitle = asString(data.about?.storyTitle, base.about.storyTitle);
   base.about.storyParagraphs = asLines(data.about?.storyParagraphs, base.about.storyParagraphs);
+  base.about.principlesTitle = asString(data.about?.principlesTitle, base.about.principlesTitle);
+  base.about.principles = asBlocks(data.about?.principles, base.about.principles);
+  base.about.teamTitle = asString(data.about?.teamTitle, base.about.teamTitle);
+  base.about.team = asBlocks(data.about?.team, base.about.team);
+  base.about.teamNote = asString(data.about?.teamNote, base.about.teamNote);
+  base.about.closeTitle = asString(data.about?.closeTitle, base.about.closeTitle);
+  base.about.closeText = asString(data.about?.closeText, base.about.closeText);
+  base.about.closeLabel = asString(data.about?.closeLabel, base.about.closeLabel);
+  base.about.closeHref = asString(data.about?.closeHref, base.about.closeHref);
 
   base.services.title = asString(data.services?.title, base.services.title);
   base.services.paragraphs = asLines(data.services?.paragraphs, base.services.paragraphs);
   base.services.items = asServices(data.services?.items, base.services.items);
+  base.services.closeTitle = asString(data.services?.closeTitle, base.services.closeTitle);
+  base.services.closeText = asString(data.services?.closeText, base.services.closeText);
+  base.services.closeLabel = asString(data.services?.closeLabel, base.services.closeLabel);
+  base.services.closeHref = asString(data.services?.closeHref, base.services.closeHref);
 
-  base.contactPage.title = asString(data.contactPage?.title, base.contactPage.title);
-  base.contactPage.nameLabel = asString(data.contactPage?.nameLabel, base.contactPage.nameLabel);
-  base.contactPage.emailLabel = asString(data.contactPage?.emailLabel, base.contactPage.emailLabel);
-  base.contactPage.phoneLabel = asString(data.contactPage?.phoneLabel, base.contactPage.phoneLabel);
-  base.contactPage.messageLabel = asString(data.contactPage?.messageLabel, base.contactPage.messageLabel);
-  base.contactPage.submitLabel = asString(data.contactPage?.submitLabel, base.contactPage.submitLabel);
+  const page = data.contactPage;
+  base.contactPage.title = asString(page?.title, base.contactPage.title);
+  base.contactPage.intro = asString(page?.intro, base.contactPage.intro);
+  base.contactPage.stepsTitle = asString(page?.stepsTitle, base.contactPage.stepsTitle);
+  base.contactPage.steps = asLines(page?.steps, base.contactPage.steps);
+  base.contactPage.whatsappButton = asString(page?.whatsappButton, base.contactPage.whatsappButton);
+  base.contactPage.nameLabel = asString(page?.nameLabel, base.contactPage.nameLabel);
+  base.contactPage.companyLabel = asString(page?.companyLabel, base.contactPage.companyLabel);
+  base.contactPage.sectorLabel = asString(page?.sectorLabel, base.contactPage.sectorLabel);
+  base.contactPage.sectors = asLines(page?.sectors, base.contactPage.sectors);
+  base.contactPage.whatsappLabel = asString(page?.whatsappLabel, base.contactPage.whatsappLabel);
+  base.contactPage.emailLabel = asString(page?.emailLabel, base.contactPage.emailLabel);
+  base.contactPage.zoneLabel = asString(page?.zoneLabel, base.contactPage.zoneLabel);
+  base.contactPage.messageLabel = asString(page?.messageLabel, base.contactPage.messageLabel);
+  base.contactPage.messagePlaceholder = asString(page?.messagePlaceholder, base.contactPage.messagePlaceholder);
+  base.contactPage.submitLabel = asString(page?.submitLabel, base.contactPage.submitLabel);
+  base.contactPage.privacy = asString(page?.privacy, base.contactPage.privacy);
+  base.contactPage.success = asString(page?.success, base.contactPage.success);
 
+  base.revision = contentRevision;
   return base;
 }
 
@@ -182,19 +260,19 @@ function withSavedAssets(base: SiteContent, saved: SiteContent): SiteContent {
   return next;
 }
 
-async function readSavedContent(): Promise<SiteContent | null> {
+async function readSavedRaw(): Promise<unknown | null> {
   if (blobConfigured()) {
     const { blobs } = await list({ prefix: contentBlobName, limit: 10, ...blobOptions() });
     const file = blobs.find((item) => item.pathname === contentBlobName);
     if (!file) return null;
     const response = await fetch(file.url, { cache: "no-store" });
     if (!response.ok) return null;
-    return mergeSiteContent(await response.json());
+    return response.json();
   }
 
   try {
     const raw = await readFile(contentPath, "utf8");
-    return mergeSiteContent(JSON.parse(raw) as unknown);
+    return JSON.parse(raw) as unknown;
   } catch {
     return null;
   }
@@ -203,11 +281,15 @@ async function readSavedContent(): Promise<SiteContent | null> {
 export const getSiteContent = cache(async (locale?: Locale): Promise<SiteContent> => {
   await connection();
   const lang = locale ?? (await getLocale());
-  const saved = (await readSavedContent()) ?? structuredClone(defaultSiteContent);
-  if (lang === "en") {
-    return withSavedAssets(englishSiteContent, saved);
-  }
-  return saved;
+  const raw = await readSavedRaw();
+  const saved = raw ? mergeSiteContent(raw) : structuredClone(defaultSiteContent);
+  const current =
+    raw && revisionOf(raw) >= contentRevision
+      ? saved
+      : withSavedAssets(structuredClone(defaultSiteContent), saved);
+  current.revision = contentRevision;
+  if (lang === "en") return withSavedAssets(structuredClone(englishSiteContent), current);
+  return current;
 });
 
 export async function saveSiteContent(content: SiteContent) {

@@ -9,16 +9,16 @@ function indexLabel(index: number) {
 
 export function ServiceGrid({ items }: { items: ServiceItem[] }) {
   return (
-    <div className="grid gap-x-12 gap-y-12 md:grid-cols-2 lg:gap-x-16">
+    <div className="grid gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-8">
       {items.map((item, index) => (
         <article key={item.id} className="border-t border-line pt-7">
           <p className="page-kicker">{indexLabel(index)}</p>
-          <h3 className="mb-4 font-sans text-base font-normal tracking-wide text-foreground md:text-lg">
+          <h3 className="mb-4 font-sans text-base font-normal text-foreground">
             <Link href={`/servicios#${item.id}`} className="transition-colors hover:text-accent">
               {item.title}
             </Link>
           </h3>
-          <p className="max-w-md text-sm font-light leading-7 text-muted">{item.paragraphs[0]}</p>
+          <p className="text-sm leading-7 text-muted">{item.summary}</p>
         </article>
       ))}
     </div>
@@ -49,14 +49,14 @@ export function ServiceBlocks({ items }: { items: ServiceItem[] }) {
           </div>
           <div>
             <p className="page-kicker">{indexLabel(index)}</p>
-            <h2 className="mb-5 font-sans text-xl font-normal tracking-wide text-foreground md:text-2xl">
-              {item.title}
-            </h2>
-            <div className="max-w-md space-y-4 text-sm font-light leading-7 text-muted md:text-base md:leading-8">
-              {item.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
+            <h2 className="mb-4 font-sans text-xl font-normal text-foreground md:text-2xl">{item.title}</h2>
+            <p className="max-w-md text-base leading-7 text-foreground">{item.lead}</p>
+            <ul className="mt-5 max-w-md list-disc space-y-2 pl-5 text-sm leading-7 text-muted md:text-base">
+              {item.points.map((point) => (
+                <li key={point}>{point}</li>
               ))}
-            </div>
+            </ul>
+            <p className="mt-5 max-w-md text-base leading-7 text-foreground">{item.closing}</p>
           </div>
         </article>
       ))}

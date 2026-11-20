@@ -16,6 +16,7 @@ export default async function PublicLayout({ children }: { children: React.React
     <>
       <SiteHeader
         site={site}
+        talkLabel={copy.contactKicker}
         themeLightLabel={copy.themeLight}
         themeDarkLabel={copy.themeDark}
         menuOpenLabel={copy.menuOpen}
@@ -27,15 +28,7 @@ export default async function PublicLayout({ children }: { children: React.React
           site={site}
           loginLabel={copy.login}
           languageSwitch={<LanguageSwitch locale={locale} />}
-          whatsapp={{
-            greeting: copy.waGreeting,
-            bubble: copy.waBubble,
-            open: copy.waOpen,
-            close: copy.waClose,
-            label: copy.waLabel,
-            role: copy.waRole,
-            messageLabel: copy.waMessageLabel,
-          }}
+          whatsappLabel={copy.waLabel}
         />
       </div>
     </>

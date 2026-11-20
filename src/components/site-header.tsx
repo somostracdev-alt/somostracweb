@@ -6,17 +6,18 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import type { SiteContent } from "@/content/site";
-import { SocialLinks } from "@/components/social-links";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function SiteHeader({
   site,
+  talkLabel,
   themeLightLabel,
   themeDarkLabel,
   menuOpenLabel,
   menuCloseLabel,
 }: {
   site: SiteContent;
+  talkLabel: string;
   themeLightLabel: string;
   themeDarkLabel: string;
   menuOpenLabel: string;
@@ -25,7 +26,6 @@ export function SiteHeader({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const transparent = scrolled && !open;
 
   useEffect(() => {
     let frame = 0;
@@ -57,13 +57,10 @@ export function SiteHeader({
 
   return (
     <header
-      className={`sticky top-0 z-40 w-full transition-[background-color,backdrop-filter] duration-300 ${
-        transparent ? "bg-[var(--header-scrolled)] backdrop-blur-md" : "bg-background"
-      }`}
+      className={`sticky top-0 z-40 w-full bg-background ${scrolled && !open ? "border-b border-line" : ""}`}
     >
-      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-3 items-center px-6 py-5 sm:px-10 md:py-6 lg:px-12">
-        <SocialLinks links={site.social} />
-        <Link href="/" className="justify-self-center" aria-label={site.brand.name}>
+      <div className="mx-auto flex w-full max-w-[1180px] items-center gap-6 px-6 py-5 sm:px-10 md:py-6 lg:px-12">
+        <Link href="/" className="shrink-0" aria-label={site.brand.name}>
           <Image
             src={site.brand.logo}
             alt={site.brand.name}
@@ -73,46 +70,55 @@ export function SiteHeader({
             className="brand-logo h-9 w-auto md:h-11"
           />
         </Link>
-        <div className="flex items-center justify-self-end gap-1">
+        <nav aria-label="Menu" className="hidden flex-1 items-center justify-center gap-8 md:flex">
+          {site.navigation.map((link) => {
+            const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.id}
+                href={link.href}
+                className={`whitespace-nowrap font-sans text-sm font-normal transition-colors hover:text-accent ${
+                  active ? "text-accent" : "text-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="ml-auto flex items-center gap-1 md:ml-0">
           <ThemeToggle lightLabel={themeLightLabel} darkLabel={themeDarkLabel} />
+          <Link
+            href="/contacto"
+            className="ml-2 hidden bg-accent px-4 py-2.5 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-black transition-colors hover:bg-[#161616] hover:text-white md:inline-flex"
+          >
+            {talkLabel}
+          </Link>
           <button
             type="button"
-            className="text-foreground transition-colors hover:text-accent"
+            className="text-foreground transition-colors hover:text-accent md:hidden"
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label={open ? menuCloseLabel : menuOpenLabel}
             onClick={() => setOpen((current) => !current)}
           >
-          {open ? (
-            <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
-              <path
-                d="M4 7h16M4 12h16M4 17h16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              />
-            </svg>
-          )}
-        </button>
+            {open ? (
+              <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 
       {open ? (
-        <div className="w-full overflow-hidden">
+        <div className="w-full overflow-hidden md:hidden">
           <div id="site-menu" className="animate-[trac-menu_0.45s_ease] bg-foreground">
-            <nav
-              aria-label="Menu"
-              className="flex w-full flex-col items-center gap-1 py-6 md:flex-row md:justify-center md:gap-16 md:py-5"
-            >
+            <nav aria-label="Menu" className="flex w-full flex-col items-center gap-1 py-6">
               {site.navigation.map((link) => {
                 const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
                 return (
@@ -128,6 +134,13 @@ export function SiteHeader({
                   </Link>
                 );
               })}
+              <Link
+                href="/contacto"
+                onClick={() => setOpen(false)}
+                className="mt-3 bg-accent px-5 py-3 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-black"
+              >
+                {talkLabel}
+              </Link>
             </nav>
           </div>
         </div>
