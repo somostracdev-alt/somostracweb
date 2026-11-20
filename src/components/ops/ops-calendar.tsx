@@ -1,9 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-import { createOpsClientAction, deleteOpsPieceAction, saveOpsPieceAction } from "@/app/ops/actions";
+import { createOpsClientAction, deleteOpsPieceAction, persistOpsPieceAction } from "@/app/ops/actions";
+import {
+  dropPieceFiles,
+  PieceFileField,
+  PieceFileGallery,
+  PieceFileThumb,
+  storePieceFiles,
+} from "@/components/ops/piece-files";
 import { useOpsPending } from "@/components/ops/ops-pending";
 import { OpsSwitch } from "@/components/ops/ops-switch";
 import { labelTone } from "@/lib/ops/labels";
@@ -74,6 +81,7 @@ function emptyPiece(publishOn: string, account: string): OpsPiece {
     brief: "",
     cta: "",
     owner: "",
+    files: [],
   };
 }
 
@@ -84,6 +92,7 @@ export function OpsCalendar({
   pieces,
   labels,
   notice,
+  blobUploads,
 }: {
   clients: OpsClient[];
   client: OpsClient;
@@ -91,6 +100,7 @@ export function OpsCalendar({
   pieces: OpsPiece[];
   labels: OpsLabelRow[];
   notice?: { ok?: string; error?: string };
+  blobUploads: boolean;
 }) {
   const router = useRouter();
   const startPending = useOpsPending();
@@ -412,6 +422,7 @@ export function OpsCalendar({
           client={client}
           month={month}
           labels={labels}
+          blobUploads={blobUploads}
           onClose={() => setOpen(null)}
         />
       ) : null}
@@ -501,9 +512,10 @@ function ClientForm({
 
 function PieceChip({ piece, labels }: { piece: OpsPiece; labels: OpsLabelRow[] }) {
   const color = colorFor(labels, "pillar", piece.pillar);
+  const file = piece.files[0];
   return (
     <span className="ops-chip w-full" style={labelTone(color)}>
-      <span className="ops-chip-dot" style={{ background: color }} />
+      {file ? <PieceFileThumb file={file} /> : <span className="ops-chip-dot" style={{ background: color }} />}
       <span className="min-w-0 flex-1 truncate">
         {piece.format || "Pieza"}
         {piece.theme ? ` · ${piece.theme}` : ""}
@@ -581,6 +593,7 @@ function PiecePeek({
           <Tag labels={labels} kind="status" name={piece.status} />
         </div>
         <div className="grid gap-4">
+          <PieceFileGallery files={piece.files} />
           <DetailLine label="Material crudo" value={piece.material} />
           <DetailLine label="Copy" value={piece.copy} />
           <DetailLine label="Brief de diseño" value={piece.brief} />
@@ -614,15 +627,51 @@ function PieceDrawer({
   client,
   month,
   labels,
+  blobUploads,
   onClose,
 }: {
   piece: OpsPiece;
   client: OpsClient;
   month: string;
   labels: OpsLabelRow[];
+  blobUploads: boolean;
   onClose: () => void;
 }) {
+  const router = useRouter();
+  const [pieceId, setPieceId] = useState(piece.id);
+  const [removedIds, setRemovedIds] = useState<string[]>([]);
+  const [pending, setPending] = useState<{ key: string; file: File; url: string }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const field = "w-full rounded-xl border border-[#cfd4cc] bg-white/70 px-3 py-2 text-sm text-[#2a302c]";
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setError(null);
+    const data = new FormData(event.currentTarget);
+    data.set("id", pieceId);
+    try {
+      const saved = await persistOpsPieceAction(data);
+      if ("error" in saved) throw new Error(saved.error);
+      setPieceId(saved.id);
+      let left = [...pending];
+      for (const item of pending) {
+        await storePieceFiles(saved.id, [item], blobUploads);
+        left = left.filter((entry) => entry.key !== item.key);
+        setPending(left);
+      }
+      await dropPieceFiles(removedIds);
+      const back = `/ops?client=${encodeURIComponent(client.slug)}&month=${encodeURIComponent(month)}`;
+      onClose();
+      router.push(`${back}&ok=${encodeURIComponent("Pieza guardada.")}`);
+      router.refresh();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "No se pudo guardar.");
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-[#2a302c]/25" onClick={onClose}>
       <div className="ops-drawer h-full w-full max-w-xl overflow-y-auto p-6" onClick={(event) => event.stopPropagation()}>
@@ -637,8 +686,8 @@ function PieceDrawer({
             Cerrar
           </button>
         </div>
-        <form action={saveOpsPieceAction} className="grid gap-3">
-          <input type="hidden" name="id" value={piece.id} />
+        <form data-skip-pending="true" onSubmit={onSubmit} className="grid gap-3">
+          <input type="hidden" name="id" value={pieceId} />
           <input type="hidden" name="clientId" value={client.id} />
           <input type="hidden" name="clientSlug" value={client.slug} />
           <input type="hidden" name="month" value={month} />
@@ -682,14 +731,25 @@ function PieceDrawer({
             Hora
             <input name="timeLabel" defaultValue={piece.timeLabel} className={field} />
           </label>
+          <PieceFileField
+            files={piece.files}
+            blobUploads={blobUploads}
+            removedIds={removedIds}
+            pending={pending}
+            onRemoveExisting={(id) => setRemovedIds((current) => (current.includes(id) ? current : [...current, id]))}
+            onRestoreExisting={(id) => setRemovedIds((current) => current.filter((item) => item !== id))}
+            onPending={setPending}
+          />
+          {error ? <p className="text-sm text-[#a45b5b]">{error}</p> : null}
           <div className="mt-2 flex flex-wrap gap-2">
-            <button type="submit" className="rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
-              Guardar
+            <button type="submit" disabled={saving} className="rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0] disabled:opacity-60">
+              {saving ? "Guardando…" : "Guardar"}
             </button>
             {piece.id ? (
               <button
                 type="submit"
-                formAction={deleteOpsPieceAction}
+                form="borrar-pieza"
+                disabled={saving}
                 onClick={confirmDelete}
                 className="rounded-full px-4 py-2 text-sm text-[#a45b5b]"
               >
@@ -698,6 +758,13 @@ function PieceDrawer({
             ) : null}
           </div>
         </form>
+        {piece.id ? (
+          <form id="borrar-pieza" action={deleteOpsPieceAction}>
+            <input type="hidden" name="id" value={piece.id} />
+            <input type="hidden" name="clientSlug" value={client.slug} />
+            <input type="hidden" name="month" value={month} />
+          </form>
+        ) : null}
       </div>
     </div>
   );

@@ -1,0 +1,507 @@
+{
+  "name": "20/11 al 31/12/2026",
+  "platform": "Meta Ads",
+  "accountRef": "Gallatrack (TRAC)",
+  "destination": "WhatsApp",
+  "channels": "Facebook e Instagram",
+  "months": [
+    { "month": "2026-11-01", "cap": 249997 },
+    { "month": "2026-12-01", "cap": 601400 }
+  ],
+  "how": [
+    "Lanzamiento de Gallatrack en Río Cuarto. La tanda de noviembre sale el 20/11 y corta el 30/11 (11 días). Diciembre corre del 1 al 31.",
+    "Los totales de noviembre se mantienen (Livianos $90.000, Camionetas $35.200, Pesados $84.800, Perfil $20.000, Video $20.000). Con 11 días el $/día sube, y el redondeo deja el mes en $249.997.",
+    "Livianos, Camionetas, Pesados y Video corren los dos meses. Perfil solo del 20 al 30/11. Remarketing arranca el 1/12 con lo que juntó noviembre.",
+    "Una campaña, un conjunto y un anuncio con variantes (estático y animado, feed y stories). El presupuesto está en el conjunto. Advantage+ apagado. Ubicaciones: Feed, Stories y Reels de Instagram y Facebook, sin Audience Network.",
+    "Venta y remarketing: mensajes de WhatsApp, optimizado por conversaciones. Perfil: visitas al perfil de Instagram. Video: ThruPlay, para armar el público CA3.",
+    "En diciembre cada campaña de venta suma una pieza nueva. El anuncio sigue siendo uno: se agrega la variante.",
+    "Eléctrico no se pauta: es venta directa.",
+    "Públicos de la cuenta: CA1 interacción en Instagram, 365 días, se excluye en Perfil. CA2 mensajes, 365 días. CA3 vio al menos el 50% de V1, 180 días. CA4 visitó el perfil, 90 días. CA2, CA3 y CA4 se excluyen en las campañas de venta y se incluyen en Remarketing. CA5 es la base de clientes de Gallagro; el parecido del 1% al 3% entra en Pesados cuando haya más de 100 contactos.",
+    "Ubicación: personas que viven en Río Cuarto + 120 km. Sin intereses. Si el parecido deja a Pesados por debajo de unas 50.000 personas, el conjunto queda abierto.",
+    "Montos netos de impuestos. $/mes = $/día × días."
+  ],
+  "pending": [
+    "Número de WhatsApp Business del comercial, conectado a la página de Facebook de Gallatrack.",
+    "Condiciones vigentes de la financiación espejo: banco, tasa, plazo, TEA y CFT para el legal de las piezas.",
+    "Modelos exactos por segmento según las fichas de Foton. Los nombres de modelo de los creativos están a confirmar.",
+    "Validación de Fede, Pablo y Foton (Magali) de piezas y copies antes de publicar.",
+    "Accesos: cuenta publicitaria Gallatrack (TRAC), medio de pago activo, página e Instagram vinculados.",
+    "Lista de clientes de Gallagro para el parecido de Pesados. Si no llega, el conjunto va abierto."
+  ],
+  "campaigns": [
+    {
+      "name": "PROS_Livianos_GT",
+      "label": "Livianos",
+      "audience": {
+        "zone": "Río Cuarto + 120 km. Personas que viven en este lugar.",
+        "who": "Abierto, sin intereses. 25–65.",
+        "exclude": "CA2 mensajes, CA3 video al 50% y CA4 visitas al perfil."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "CJ_Livianos_RC120km",
+          "kind": "always_on",
+          "windowLabel": "20/11 – 30/11",
+          "message": "Llegó Foton a Río Cuarto. Ultralivianos y livianos con financiación espejo de la terminal.",
+          "adsLabel": "L1 estático (4:5 y 9:16) · L2 animado (4:5 y 9:16)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto. Excluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 8182,
+          "days": 11,
+          "ads": [
+            {
+              "name": "AD_Livianos_Nov",
+              "angle": "Foton en Río Cuarto · Financiación de fábrica",
+              "body": "Llegó Foton a Río Cuarto. Ultralivianos y livianos para tu reparto o tu negocio, con la financiación de la terminal. Escribinos y te pasamos las condiciones.",
+              "prefilled": "Hola! Vi el anuncio de los livianos Foton y quiero info de la financiación"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "CJ_Livianos_RC120km",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Financiación espejo de la terminal. Pieza nueva de diciembre: cerrá el año con tu Foton.",
+          "adsLabel": "Se suma L3 estático de diciembre (4:5 y 9:16) al anuncio de noviembre",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto. Excluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 6800,
+          "days": 31,
+          "ads": [
+            {
+              "name": "AD_Livianos_Nov",
+              "angle": "Financiación de fábrica",
+              "body": "Cerrá el año con tu Foton. Ultralivianos y livianos con la financiación de la terminal. Escribinos.",
+              "prefilled": "Hola! Vi el anuncio de los livianos Foton y quiero info de la financiación"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROS_Camionetas_GT",
+      "label": "Camionetas",
+      "audience": {
+        "zone": "Río Cuarto + 120 km. Personas que viven en este lugar.",
+        "who": "Abierto, sin intereses. 25–65.",
+        "exclude": "CA2 mensajes, CA3 video al 50% y CA4 visitas al perfil."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "CJ_Camionetas_RC120km",
+          "kind": "always_on",
+          "windowLabel": "20/11 – 30/11",
+          "message": "Camioneta Foton con financiación espejo. Vení a verla al conce.",
+          "adsLabel": "C1 estático (4:5 y 9:16) · C2 animado (4:5 y 9:16)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto. Excluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 3200,
+          "days": 11,
+          "ads": [
+            {
+              "name": "AD_Camionetas_Nov",
+              "angle": "Vení a verla a Gallatrack",
+              "body": "La camioneta Foton ya está en Río Cuarto. Vení a verla al conce y consultá la financiación de la terminal.",
+              "prefilled": "Hola! Vi el anuncio de la camioneta Foton y quiero info"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "CJ_Camionetas_RC120km",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Financiación espejo y vení a verla al conce. Pieza nueva de diciembre.",
+          "adsLabel": "Se suma C3 estático de diciembre (4:5 y 9:16), con foto real en el conce",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto. Excluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 2900,
+          "days": 31,
+          "ads": [
+            {
+              "name": "AD_Camionetas_Nov",
+              "angle": "Vení a verla a Gallatrack",
+              "body": "Tu camioneta Foton te espera en el conce. Pasá a verla y consultá la financiación.",
+              "prefilled": "Hola! Vi el anuncio de la camioneta Foton y quiero info"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROS_Pesados_GT",
+      "label": "Pesados",
+      "audience": {
+        "zone": "Río Cuarto + 120 km. Personas que viven en este lugar.",
+        "who": "Abierto, más el parecido de clientes Gallagro (1% a 3%) si la base ya está. 25–65. Si ese parecido deja el público por debajo de unas 50.000 personas, dejarlo abierto.",
+        "exclude": "CA2 mensajes, CA3 video al 50% y CA4 visitas al perfil."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "CJ_Pesados_RC120km",
+          "kind": "always_on",
+          "windowLabel": "20/11 – 30/11",
+          "message": "Medianos y pesados Foton con financiación espejo. Respaldo de un grupo con 10 años en la zona.",
+          "adsLabel": "P1 estático (4:5 y 9:16) · P2 animado (4:5 y 9:16)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto + parecido de clientes Gallagro, si ya está. Excluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 7709,
+          "days": 11,
+          "ads": [
+            {
+              "name": "AD_Pesados_Nov",
+              "angle": "Camiones Foton · Concesionario oficial",
+              "body": "Camiones Foton medianos y pesados, ahora en Río Cuarto. Financiación de la terminal y el respaldo de un grupo con 10 años en la zona. Escribinos.",
+              "prefilled": "Hola! Vi el anuncio de los camiones Foton y quiero info"
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "CJ_Pesados_RC120km",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Financiación espejo y respaldo del grupo. Pieza nueva de diciembre.",
+          "adsLabel": "Se suma P3 estático de diciembre (4:5 y 9:16)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto + parecido de clientes Gallagro. Excluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 6450,
+          "days": 31,
+          "ads": [
+            {
+              "name": "AD_Pesados_Nov",
+              "angle": "Camiones Foton · Concesionario oficial",
+              "body": "Arrancá el 2027 con un Foton. Medianos y pesados con financiación de la terminal.",
+              "prefilled": "Hola! Vi el anuncio de los camiones Foton y quiero info"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MARCA_Perfil_GT",
+      "label": "Perfil",
+      "audience": {
+        "zone": "Río Cuarto + 120 km. Personas que viven en este lugar.",
+        "who": "Abierto, sin intereses. 20–65.",
+        "exclude": "CA1: personas que ya siguen o interactuaron con @gallatrack.oficial."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "CJ_Perfil_RC120km",
+          "kind": "special",
+          "windowLabel": "20/11 – 30/11",
+          "message": "Llegó Foton a Río Cuarto. Seguí a Gallatrack, concesionario oficial.",
+          "adsLabel": "M1 estático (4:5 y 9:16) · M2 animado (4:5 y 9:16)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 20–65. Incluye: abierto. Excluye: CA1. Objetivo: visitas al perfil de Instagram @gallatrack.oficial.",
+          "whatsapp": "Va al perfil",
+          "dailyBudget": 1818,
+          "days": 11,
+          "ads": [
+            {
+              "name": "AD_Perfil_Nov",
+              "angle": "Visitar perfil",
+              "body": "Llegó Foton a Río Cuarto. Seguí a Gallatrack, concesionario oficial, y enterate de todo lo que viene.",
+              "prefilled": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MARCA_Video_GT",
+      "label": "Video",
+      "audience": {
+        "zone": "Río Cuarto + 120 km. Personas que viven en este lugar.",
+        "who": "Abierto, sin intereses. 25–65.",
+        "exclude": "No excluye. Sirve para armar CA3."
+      },
+      "sets": [
+        {
+          "month": "2026-11-01",
+          "name": "CJ_Video_RC120km",
+          "kind": "always_on",
+          "windowLabel": "20/11 – 30/11",
+          "message": "Presentación de marca y gama: Gallatrack, concesionario oficial Foton en Río Cuarto.",
+          "adsLabel": "V1 video de presentación (9:16 y 4:5, 15–30 s)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto. Sin destino: arma el público CA3. Objetivo: ThruPlay.",
+          "whatsapp": "Sin destino",
+          "dailyBudget": 1818,
+          "days": 11,
+          "ads": [
+            {
+              "name": "AD_Video_Nov",
+              "angle": "Presentación de marca",
+              "body": "Gallatrack, concesionario oficial Foton en Río Cuarto. Camiones, utilitarios y pick-ups.",
+              "prefilled": ""
+            }
+          ]
+        },
+        {
+          "month": "2026-12-01",
+          "name": "CJ_Video_RC120km",
+          "kind": "always_on",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Mismo video de presentación. Sumar un segundo video de gama si hay material.",
+          "adsLabel": "V1 se reutiliza. Segundo video de gama solo si hay material",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: abierto. Sigue armando CA3. Objetivo: ThruPlay.",
+          "whatsapp": "Sin destino",
+          "dailyBudget": 1950,
+          "days": 31,
+          "ads": [
+            {
+              "name": "AD_Video_Nov",
+              "angle": "Presentación de marca",
+              "body": "Gallatrack, concesionario oficial Foton en Río Cuarto. Camiones, utilitarios y pick-ups.",
+              "prefilled": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "REM_GT",
+      "label": "Remarketing",
+      "audience": {
+        "zone": "Río Cuarto + 120 km. Personas que viven en este lugar.",
+        "who": "CA2 mensajes, CA3 video al 50% y CA4 visitas al perfil. 25–65.",
+        "exclude": "No excluye."
+      },
+      "sets": [
+        {
+          "month": "2026-12-01",
+          "name": "CJ_REM_RC120km",
+          "kind": "special",
+          "windowLabel": "1/12 – 31/12",
+          "message": "Ya podés ver las unidades en el conce. Financiación espejo. Escribinos y reservá la tuya. El service bonificado queda para la preventa de febrero.",
+          "adsLabel": "R1 estático (4:5 y 9:16) · R2 animado (4:5 y 9:16)",
+          "brands": "Foton",
+          "zoneNote": "Río Cuarto + 120 km · viven aquí · 25–65. Incluye: CA2 + CA3 + CA4. Objetivo: mensajes de WhatsApp.",
+          "whatsapp": "Comercial Gallatrack",
+          "dailyBudget": 1300,
+          "days": 31,
+          "ads": [
+            {
+              "name": "AD_REM_Dic",
+              "angle": "Vení a conocerlas",
+              "body": "Ya podés ver las unidades Foton en Gallatrack, Río Cuarto. Escribinos, coordinamos la visita y te pasamos la financiación.",
+              "prefilled": "Hola! Quiero coordinar para ver las unidades Foton"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "creatives": [
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Livianos",
+      "adSetName": "CJ_Livianos_RC120km",
+      "adName": "L1",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Llegó Foton a Río Cuarto. Financiación de la terminal. CTA: Escribinos.",
+      "material": "Ultraliviano o liviano Foton, modelo según ficha, en uso urbano o de reparto. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Livianos",
+      "adSetName": "CJ_Livianos_RC120km",
+      "adName": "L2",
+      "imageFeed": 0,
+      "imageStory": 0,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Misma idea que L1, animada (5–10 s).",
+      "material": "Video de Foton o L1 animado. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Camionetas",
+      "adSetName": "CJ_Camionetas_RC120km",
+      "adName": "C1",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "La camioneta Foton ya está en Río Cuarto. Vení a verla al conce. Financiación.",
+      "material": "Pick-up Foton (Tunland, confirmar versión) en campo o ruta. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Camionetas",
+      "adSetName": "CJ_Camionetas_RC120km",
+      "adName": "C2",
+      "imageFeed": 0,
+      "imageStory": 0,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Misma idea que C1, animada (5–10 s).",
+      "material": "Video de Foton de la pick-up. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Pesados",
+      "adSetName": "CJ_Pesados_RC120km",
+      "adName": "P1",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Camiones Foton en Río Cuarto. Financiación de la terminal. Respaldo del grupo.",
+      "material": "Aumark o Auman, confirmar modelos, en ruta o acopio. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Pesados",
+      "adSetName": "CJ_Pesados_RC120km",
+      "adName": "P2",
+      "imageFeed": 0,
+      "imageStory": 0,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Misma idea que P1, animada (5–10 s).",
+      "material": "Video de Foton de camión. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Perfil",
+      "adSetName": "CJ_Perfil_RC120km",
+      "adName": "M1",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Llegó Foton a Río Cuarto. Gallatrack, concesionario oficial. Seguinos.",
+      "material": "Gama completa o frente de unidad, logo Foton y Gallatrack, versión blanca sobre oscuro. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Perfil",
+      "adSetName": "CJ_Perfil_RC120km",
+      "adName": "M2",
+      "imageFeed": 0,
+      "imageStory": 0,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Misma idea que M1, animada: la cuenta de que llegó, con revelado de unidades.",
+      "material": "Clips de unidades. 1080×1350 y 1080×1920.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "19/11",
+      "dueOn": "2026-11-19",
+      "campaignLabel": "Video",
+      "adSetName": "CJ_Video_RC120km",
+      "adName": "V1",
+      "imageFeed": 0,
+      "imageStory": 0,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Presentación de marca: quiénes somos, la gama (camiones, utilitarios y pick-ups) y concesionario oficial en Río Cuarto. 15–30 s.",
+      "material": "Edición con videos de Foton y tomas del conce o de las unidades. 1080×1920 y 1080×1350.",
+      "deliverLabel": "19/11"
+    },
+    {
+      "dueLabel": "28/11",
+      "dueOn": "2026-11-28",
+      "campaignLabel": "Livianos",
+      "adSetName": "CJ_Livianos_RC120km",
+      "adName": "L3",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Cerrá el año con tu Foton. Financiación de la terminal.",
+      "material": "Liviano Foton, otra toma distinta a L1. 1080×1350 y 1080×1920.",
+      "deliverLabel": "28/11"
+    },
+    {
+      "dueLabel": "28/11",
+      "dueOn": "2026-11-28",
+      "campaignLabel": "Camionetas",
+      "adSetName": "CJ_Camionetas_RC120km",
+      "adName": "C3",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Tu camioneta te espera en el conce. Financiación.",
+      "material": "Pick-up en el conce de Río Cuarto, foto real. 1080×1350 y 1080×1920.",
+      "deliverLabel": "28/11"
+    },
+    {
+      "dueLabel": "28/11",
+      "dueOn": "2026-11-28",
+      "campaignLabel": "Pesados",
+      "adSetName": "CJ_Pesados_RC120km",
+      "adName": "P3",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Arrancá el 2027 con un Foton. Financiación.",
+      "material": "Camión Foton, otra toma distinta a P1. 1080×1350 y 1080×1920.",
+      "deliverLabel": "28/11"
+    },
+    {
+      "dueLabel": "28/11",
+      "dueOn": "2026-11-28",
+      "campaignLabel": "Remarketing",
+      "adSetName": "CJ_REM_RC120km",
+      "adName": "R1",
+      "imageFeed": 1,
+      "imageStory": 1,
+      "videoStory": 0,
+      "videoFeed": 0,
+      "copy": "Ya podés ver las unidades en Gallatrack. Coordiná tu visita. Financiación.",
+      "material": "Unidades en el conce, foto real. Es para gente que ya nos conoce. 1080×1350 y 1080×1920.",
+      "deliverLabel": "28/11"
+    },
+    {
+      "dueLabel": "28/11",
+      "dueOn": "2026-11-28",
+      "campaignLabel": "Remarketing",
+      "adSetName": "CJ_REM_RC120km",
+      "adName": "R2",
+      "imageFeed": 0,
+      "imageStory": 0,
+      "videoStory": 1,
+      "videoFeed": 1,
+      "copy": "Misma idea que R1, animada (5–10 s).",
+      "material": "Recorrido por las unidades en el conce. 1080×1350 y 1080×1920.",
+      "deliverLabel": "28/11"
+    }
+  ]
+}

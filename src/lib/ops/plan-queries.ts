@@ -345,7 +345,7 @@ async function copyContinuingSets(
   targetMonth: string,
 ) {
   const sets = await sql`
-    SELECT id, name, kind, window_label, message, ads_label, brands, zone_note, whatsapp, daily_budget, days, sort
+    SELECT id, name, kind, window_label, message, ads_label, brands, zone_note, whatsapp, days, sort
     FROM ops_ad_sets
     WHERE campaign_id = ${sourceId} AND kind IN ('always_on', 'off')
     ORDER BY sort, name
@@ -360,7 +360,7 @@ async function copyContinuingSets(
       ) VALUES (
         ${targetId}, ${targetMonth}::date, ${String(set.name ?? "")}, ${String(set.kind)}, ${windowFor(targetMonth)},
         ${String(set.message ?? "")}, ${String(set.ads_label ?? "")}, ${String(set.brands ?? "")},
-        ${String(set.zone_note ?? "")}, ${String(set.whatsapp ?? "")}, ${set.daily_budget}, ${days}, ${Number(set.sort ?? 0)}
+        ${String(set.zone_note ?? "")}, ${String(set.whatsapp ?? "")}, ${null}, ${days}, ${Number(set.sort ?? 0)}
       )
       RETURNING id
     `;
@@ -469,6 +469,80 @@ type AdSetInput = {
   days: number;
 };
 
+type OpsSql = NonNullable<Awaited<ReturnType<typeof ensureOpsSchema>>>;
+
+async function mirrorContinuingSet(sql: OpsSql, campaignId: string, input: AdSetInput) {
+  if (input.kind !== "always_on" && input.kind !== "off") return;
+  const owner = await sql`SELECT series_id, month FROM ops_campaigns WHERE id = ${campaignId}`;
+  if (!owner[0]) return;
+  const seriesId = String(owner[0].series_id);
+  const sourceMonth = asDate(owner[0].month);
+  const siblings = await sql`
+    SELECT id, month FROM ops_campaigns
+    WHERE series_id = ${seriesId}::uuid AND id <> ${campaignId}
+  `;
+  const sourceLength = monthLength(sourceMonth);
+  const name = input.name.trim();
+  for (const sibling of siblings) {
+    const siblingId = String(sibling.id);
+    const siblingMonth = asDate(sibling.month);
+    const existing = await sql`
+      SELECT id FROM ops_ad_sets
+      WHERE campaign_id = ${siblingId} AND name = ${name}
+      LIMIT 1
+    `;
+    if (existing[0]) continue;
+    const days = input.days === sourceLength ? monthLength(siblingMonth) : input.days;
+    const sort = await nextSort(sql, "ops_ad_sets", siblingId);
+    await sql`
+      INSERT INTO ops_ad_sets (
+        campaign_id, month, name, kind, window_label, message, ads_label,
+        brands, zone_note, whatsapp, daily_budget, days, sort
+      ) VALUES (
+        ${siblingId}, ${siblingMonth}::date, ${name}, ${input.kind}, ${windowFor(siblingMonth)},
+        ${input.message}, ${input.adsLabel}, ${input.brands}, ${input.zoneNote}, ${input.whatsapp},
+        ${null}, ${days}, ${sort}
+      )
+    `;
+  }
+}
+
+async function mirrorAd(sql: OpsSql, setId: string, input: AdInput) {
+  const owner = await sql`
+    SELECT s.name AS set_name, s.kind, c.series_id
+    FROM ops_ad_sets s
+    JOIN ops_campaigns c ON c.id = s.campaign_id
+    WHERE s.id = ${setId}
+  `;
+  if (!owner[0]) return;
+  const kind = String(owner[0].kind);
+  if (kind !== "always_on" && kind !== "off") return;
+  const seriesId = String(owner[0].series_id);
+  const setName = String(owner[0].set_name ?? "");
+  const siblings = await sql`
+    SELECT s.id
+    FROM ops_ad_sets s
+    JOIN ops_campaigns c ON c.id = s.campaign_id
+    WHERE c.series_id = ${seriesId}::uuid
+      AND s.id <> ${setId}
+      AND s.name = ${setName}
+      AND s.kind IN ('always_on', 'off')
+  `;
+  const name = input.name.trim();
+  for (const sibling of siblings) {
+    const siblingId = String(sibling.id);
+    const existing = await sql`
+      SELECT id FROM ops_ads WHERE ad_set_id = ${siblingId} AND name = ${name} LIMIT 1
+    `;
+    if (existing[0]) continue;
+    const sort = await nextSort(sql, "ops_ads", siblingId);
+    await sql`
+      INSERT INTO ops_ads (ad_set_id, name, angle, body, prefilled, sort)
+      VALUES (${siblingId}, ${name}, ${input.angle}, ${input.body}, ${input.prefilled}, ${sort})
+    `;
+  }
+}
+
 export async function createOpsAdSet(campaignId: string, month: string, input: AdSetInput) {
   const sql = await ensureOpsSchema();
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
@@ -488,6 +562,7 @@ export async function createOpsAdSet(campaignId: string, month: string, input: A
       ${input.dailyBudget}, ${input.days}, ${sort}
     )
   `;
+  await mirrorContinuingSet(sql, campaignId, input);
 }
 
 export async function updateOpsAdSet(id: string, input: AdSetInput) {
@@ -531,6 +606,7 @@ export async function createOpsAd(setId: string, input: AdInput) {
     INSERT INTO ops_ads (ad_set_id, name, angle, body, prefilled, sort)
     VALUES (${setId}, ${input.name.trim()}, ${input.angle}, ${input.body}, ${input.prefilled}, ${sort})
   `;
+  await mirrorAd(sql, setId, input);
 }
 
 export async function updateOpsAd(id: string, input: AdInput) {

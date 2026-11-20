@@ -1,5 +1,7 @@
 import { ensureOpsSchema } from "@/lib/ops/db";
 import { defaultLabels, type LabelKind } from "@/lib/ops/labels";
+import { acceptablePieceFileUrl, rejectionReason } from "@/lib/ops/piece-media";
+import { discardStoredFile } from "@/lib/ops/piece-storage";
 
 export type OpsClient = {
   id: string;
@@ -30,9 +32,18 @@ export type OpsPiece = {
   brief: string;
   cta: string;
   owner: string;
+  files: OpsPieceFile[];
 };
 
-export type PieceInput = Omit<OpsPiece, "id" | "clientId">;
+export type OpsPieceFile = {
+  id: string;
+  url: string;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+};
+
+export type PieceInput = Omit<OpsPiece, "id" | "clientId" | "files">;
 
 function asDate(value: unknown) {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
@@ -55,7 +66,39 @@ function asPiece(row: Record<string, unknown>): OpsPiece {
     brief: String(row.brief ?? ""),
     cta: String(row.cta ?? ""),
     owner: String(row.owner ?? ""),
+    files: [],
   };
+}
+
+function asFile(row: Record<string, unknown>): OpsPieceFile {
+  return {
+    id: String(row.id),
+    url: String(row.url ?? ""),
+    filename: String(row.filename ?? ""),
+    contentType: String(row.content_type ?? ""),
+    sizeBytes: Number(row.size_bytes ?? 0),
+  };
+}
+
+async function attachFiles(pieces: OpsPiece[]) {
+  if (!pieces.length) return pieces;
+  const sql = await ensureOpsSchema();
+  if (!sql) return pieces;
+  const ids = pieces.map((piece) => piece.id);
+  const rows = await sql`
+    SELECT id, piece_id, url, filename, content_type, size_bytes
+    FROM ops_piece_files
+    WHERE piece_id::text = ANY(${ids})
+    ORDER BY sort, created_at
+  `;
+  const byPiece = new Map<string, OpsPieceFile[]>();
+  for (const row of rows) {
+    const pieceId = String(row.piece_id);
+    const list = byPiece.get(pieceId) ?? [];
+    list.push(asFile(row as Record<string, unknown>));
+    byPiece.set(pieceId, list);
+  }
+  return pieces.map((piece) => ({ ...piece, files: byPiece.get(piece.id) ?? [] }));
 }
 
 export async function listOpsClients() {
@@ -161,14 +204,16 @@ export async function listOpsPieces(clientId: string, from: string, to: string) 
       AND publish_on <= ${to}::date
     ORDER BY publish_on, sort, created_at
   `;
-  return rows.map((row) => asPiece(row as Record<string, unknown>));
+  return attachFiles(rows.map((row) => asPiece(row as Record<string, unknown>)));
 }
 
 export async function getOpsPiece(id: string) {
   const sql = await ensureOpsSchema();
   if (!sql) return null;
   const rows = await sql`SELECT * FROM ops_pieces WHERE id = ${id} LIMIT 1`;
-  return rows[0] ? asPiece(rows[0] as Record<string, unknown>) : null;
+  if (!rows[0]) return null;
+  const [piece] = await attachFiles([asPiece(rows[0] as Record<string, unknown>)]);
+  return piece;
 }
 
 export async function createOpsPiece(clientId: string, input: PieceInput) {
@@ -216,5 +261,57 @@ export async function updateOpsPiece(id: string, input: PieceInput) {
 export async function deleteOpsPiece(id: string) {
   const sql = await ensureOpsSchema();
   if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
+  const files = await sql`SELECT url FROM ops_piece_files WHERE piece_id = ${id}`;
   await sql`DELETE FROM ops_pieces WHERE id = ${id}`;
+  for (const row of files) await discardStoredFile(String(row.url ?? ""));
+}
+
+export async function addOpsPieceFile(input: {
+  pieceId: string;
+  url: string;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+}) {
+  const sql = await ensureOpsSchema();
+  if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
+  if (!acceptablePieceFileUrl(input.url)) throw new Error("El archivo quedó en un lugar que no podemos guardar.");
+  const piece = await sql`SELECT id FROM ops_pieces WHERE id = ${input.pieceId} LIMIT 1`;
+  if (!piece[0]) throw new Error("No se encontró la pieza.");
+  const existing = await sql`
+    SELECT count(*)::int AS n, coalesce(sum(size_bytes), 0)::int AS bytes
+    FROM ops_piece_files
+    WHERE piece_id = ${input.pieceId}
+  `;
+  const already = Number(existing[0]?.n ?? 0);
+  const alreadyBytes = Number(existing[0]?.bytes ?? 0);
+  const storedOnBlob = input.url.startsWith("https://");
+  const reason = rejectionReason(
+    { type: input.contentType, size: input.sizeBytes },
+    { blob: storedOnBlob, already, alreadyBytes },
+  );
+  if (reason) throw new Error(reason);
+  const rows = await sql`
+    INSERT INTO ops_piece_files (piece_id, url, filename, content_type, size_bytes, sort)
+    VALUES (
+      ${input.pieceId},
+      ${input.url},
+      ${input.filename.slice(0, 180)},
+      ${input.contentType},
+      ${Math.round(input.sizeBytes)},
+      ${already}
+    )
+    RETURNING id, url, filename, content_type, size_bytes
+  `;
+  return asFile(rows[0] as Record<string, unknown>);
+}
+
+export async function removeOpsPieceFile(id: string) {
+  const sql = await ensureOpsSchema();
+  if (!sql) throw new Error("Falta DATABASE_URL de Neon.");
+  const rows = await sql`SELECT url FROM ops_piece_files WHERE id = ${id} LIMIT 1`;
+  if (!rows[0]) return;
+  const url = String(rows[0].url ?? "");
+  await sql`DELETE FROM ops_piece_files WHERE id = ${id}`;
+  await discardStoredFile(url);
 }

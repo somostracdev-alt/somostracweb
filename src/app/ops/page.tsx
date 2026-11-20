@@ -2,6 +2,7 @@ import { connection } from "next/server";
 
 import { OpsCalendar } from "@/components/ops/ops-calendar";
 import { databaseUrl, describeDatabaseUrl } from "@/lib/ops/db";
+import { blobUploadsEnabled } from "@/lib/ops/piece-storage";
 import { getOpsClient, listOpsClients, listOpsLabels, listOpsPieces } from "@/lib/ops/queries";
 
 export const instant = false;
@@ -96,6 +97,7 @@ export default async function OpsPage({ searchParams }: { searchParams: SearchPa
       pieces={pieces}
       labels={labels}
       notice={{ ok: params.ok, error: params.error }}
+      blobUploads={blobUploadsEnabled()}
     />
   );
 }

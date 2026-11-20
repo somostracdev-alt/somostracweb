@@ -82,6 +82,16 @@ function counts(set: PlanAdSet) {
   return { daily: set.dailyBudget, month: set.dailyBudget * set.days };
 }
 
+function budgetPending(set: PlanAdSet) {
+  return set.kind !== "off" && set.dailyBudget === null;
+}
+
+function monthMoneyLabel(set: PlanAdSet) {
+  if (budgetPending(set)) return "A confirmar";
+  const money = counts(set);
+  return money ? pesos(money.month) : "—";
+}
+
 function pieceCount(item: PlanCreative) {
   return item.imageFeed + item.imageStory + item.videoStory + item.videoFeed;
 }
@@ -499,6 +509,7 @@ function MonthBoard({
     const money = counts(item.set);
     return money ? [money] : [];
   });
+  const pending = monthSets.filter((item) => budgetPending(item.set)).length;
   const cap = plan.months.find((month) => month.month === monthKey)?.cap ?? 0;
   const dailyTotal = live.reduce((sum, item) => sum + item.daily, 0);
   const monthTotal = live.reduce((sum, item) => sum + item.month, 0);
@@ -522,6 +533,14 @@ function MonthBoard({
           </div>
         ))}
       </section>
+
+      {pending ? (
+        <p className="rounded-2xl bg-[#8a5a1222] px-4 py-3 text-sm text-[#8a5a12]">
+          {pending === 1
+            ? "Hay 1 conjunto con el presupuesto a confirmar. Los otros meses no cambian."
+            : `Hay ${pending} conjuntos con el presupuesto a confirmar. Los otros meses no cambian.`}
+        </p>
+      ) : null}
 
       {how.length ? (
         <details className="ops-month-summary rounded-2xl bg-[#f3f1eb] px-4 py-3">
@@ -563,7 +582,7 @@ function MonthBoard({
             <div className="grid gap-2">
               {rows.length ? (
                 rows.map((set) => {
-                  const money = counts(set);
+                  const pendingBudget = budgetPending(set);
                   return (
                     <button
                       key={set.id}
@@ -580,8 +599,10 @@ function MonthBoard({
                         {kindLabel[set.kind]}
                       </span>
                       <span className="shrink-0 text-right">
-                        <Caption>$/mes</Caption>
-                        <span className="block text-sm font-semibold tabular-nums">{money ? pesos(money.month) : "—"}</span>
+                        <Caption>{pendingBudget ? "Presupuesto" : "$/mes"}</Caption>
+                        <span className={`block text-sm font-semibold ${pendingBudget ? "text-[#8a5a12]" : "tabular-nums"}`}>
+                          {monthMoneyLabel(set)}
+                        </span>
                       </span>
                     </button>
                   );
@@ -807,7 +828,11 @@ function SetPeek({
   if (!found) return null;
   const { campaign, set } = found;
   const money = counts(set);
-  const budget = money ? `${pesos(money.daily)} × ${set.days} días = ${pesos(money.month)}` : "Sin presupuesto";
+  const budget = budgetPending(set)
+    ? "A confirmar. Cargar el $/día de este mes no cambia los otros."
+    : money
+      ? `${pesos(money.daily)} × ${set.days} días = ${pesos(money.month)}`
+      : "Sin presupuesto";
   return (
     <Popup kicker={campaign.label || campaign.name} titleLabel="Conjunto" title={set.name} onClose={onClose}>
       <div className="mb-5 flex flex-wrap gap-x-4 gap-y-3">
@@ -1046,7 +1071,7 @@ function CampaignDrawer({
           </label>
         </div>
         <p className="text-xs text-[#5c6560]">
-          En cada mes nuevo se copian el Always on y el Apagado, con sus anuncios. El Especial queda en su mes. El público es uno para toda la campaña.
+          En cada mes nuevo se copian el Always on y el Apagado, con sus anuncios y el mensaje. El $/día de ese mes queda a confirmar. El Especial se queda en su mes. El público es uno para toda la campaña.
         </p>
         <button type="submit" className="mt-2 w-fit rounded-full bg-[#4f6f52] px-4 py-2 text-sm text-[#f7f5f0]">
           {campaign ? "Guardar" : "Crear"}
@@ -1099,13 +1124,16 @@ function SetDrawer({
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="grid gap-1 text-xs">
             $/día
-            <input name="dailyBudget" defaultValue={set.dailyBudget ?? ""} inputMode="numeric" className={field} />
+            <input name="dailyBudget" defaultValue={set.dailyBudget ?? ""} inputMode="numeric" className={field} placeholder="A confirmar" />
           </label>
           <label className="grid gap-1 text-xs">
             Días
             <input name="days" defaultValue={set.days} inputMode="numeric" className={field} />
           </label>
         </div>
+        <p className="text-xs text-[#5c6560]">
+          Este monto es solo de este mes. Si lo dejás vacío, queda a confirmar.
+        </p>
         <label className="grid gap-1 text-xs">
           WhatsApp
           <input name="whatsapp" defaultValue={set.whatsapp} className={field} placeholder="Ej. Fede (maquinaria)" />

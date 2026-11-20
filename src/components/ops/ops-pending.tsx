@@ -38,6 +38,8 @@ export function OpsPending({ children }: { children: ReactNode }) {
 
     function onSubmit(event: Event) {
       if (event.defaultPrevented) return;
+      const form = event.target instanceof HTMLFormElement ? event.target : null;
+      if (form?.dataset.skipPending === "true") return;
       setPending(true);
     }
 

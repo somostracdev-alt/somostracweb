@@ -74,6 +74,33 @@
   border-radius: 999px;
 }
 
+.ops-chip-thumb {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  border-radius: 0.25rem;
+  object-fit: cover;
+}
+
+.ops-chip-play {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  border-radius: 0.25rem;
+  background: #2a302c;
+  position: relative;
+}
+
+.ops-chip-play::before {
+  content: "";
+  position: absolute;
+  top: 0.28rem;
+  left: 0.38rem;
+  border-style: solid;
+  border-width: 0.22rem 0 0.22rem 0.32rem;
+  border-color: transparent transparent transparent #f7f5f0;
+}
+
 .ops-day {
   min-height: 9.5rem;
   border-radius: 1rem;

@@ -1,6 +1,7 @@
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 
 import { defaultLabels } from "@/lib/ops/labels";
+import { seedGallatrack } from "@/lib/ops/seed-gallatrack";
 import { seedGallagroPlan } from "@/lib/ops/seed-plan";
 import gallagroPieces from "@/ops/seed/gallagro-pieces.json";
 import gallagroPlan from "@/ops/seed/gallagro-plan.json";
@@ -100,6 +101,19 @@ export async function ensureOpsSchema() {
     )
   `;
   await client`CREATE INDEX IF NOT EXISTS ops_pieces_client_date_idx ON ops_pieces (client_id, publish_on)`;
+  await client`
+    CREATE TABLE IF NOT EXISTS ops_piece_files (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      piece_id uuid NOT NULL REFERENCES ops_pieces(id) ON DELETE CASCADE,
+      url text NOT NULL,
+      filename text NOT NULL DEFAULT '',
+      content_type text NOT NULL DEFAULT '',
+      size_bytes integer NOT NULL DEFAULT 0,
+      sort integer NOT NULL DEFAULT 0,
+      created_at timestamptz NOT NULL DEFAULT now()
+    )
+  `;
+  await client`CREATE INDEX IF NOT EXISTS ops_piece_files_piece_idx ON ops_piece_files (piece_id, sort)`;
   await client`
     CREATE TABLE IF NOT EXISTS ops_plans (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -209,6 +223,7 @@ export async function ensureOpsSchema() {
   await seedGallagro(client);
   await seedGallagroPlan(client);
   await migrateCampaignMonths(client);
+  await seedGallatrack(client);
   ready = true;
   return client;
 }

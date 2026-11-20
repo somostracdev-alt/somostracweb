@@ -4,7 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { isAdminAuthenticated } from "@/lib/admin-session";
-import { createOpsClient, createOpsPiece, deleteOpsPiece, updateOpsPiece } from "@/lib/ops/queries";
+import {
+  addOpsPieceFile,
+  createOpsClient,
+  createOpsPiece,
+  deleteOpsPiece,
+  removeOpsPieceFile,
+  updateOpsPiece,
+} from "@/lib/ops/queries";
 
 function text(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
@@ -69,23 +76,47 @@ export async function createOpsClientAction(formData: FormData) {
   redirect(`${next}&ok=${encodeURIComponent("Cliente creado.")}`);
 }
 
-export async function saveOpsPieceAction(formData: FormData) {
-  await guard();
+export async function persistOpsPieceAction(formData: FormData) {
+  if (!(await isAdminAuthenticated())) return { error: "Tenés que entrar de nuevo." };
   const id = text(formData, "id");
   const clientId = text(formData, "clientId");
   const input = pieceInput(formData);
-  if (!input.publishOn) {
-    redirect(`${backTo(formData)}&error=${encodeURIComponent("Falta la fecha.")}`);
-  }
+  if (!input.publishOn) return { error: "Falta la fecha." };
   try {
-    if (id) await updateOpsPiece(id, input);
-    else await createOpsPiece(clientId, input);
+    const piece = id ? await updateOpsPiece(id, input) : await createOpsPiece(clientId, input);
+    revalidatePath("/ops");
+    return { id: piece.id };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "No se pudo guardar.";
-    redirect(`${backTo(formData)}&error=${encodeURIComponent(message)}`);
+    return { error: error instanceof Error ? error.message : "No se pudo guardar." };
   }
-  revalidatePath("/ops");
-  redirect(`${backTo(formData)}&ok=${encodeURIComponent("Pieza guardada.")}`);
+}
+
+export async function addOpsPieceFileAction(input: {
+  pieceId: string;
+  url: string;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+}) {
+  if (!(await isAdminAuthenticated())) return { error: "Tenés que entrar de nuevo." };
+  try {
+    const file = await addOpsPieceFile(input);
+    revalidatePath("/ops");
+    return { file };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "No se pudo guardar el archivo." };
+  }
+}
+
+export async function removeOpsPieceFileAction(id: string) {
+  if (!(await isAdminAuthenticated())) return { error: "Tenés que entrar de nuevo." };
+  try {
+    await removeOpsPieceFile(id);
+    revalidatePath("/ops");
+    return { ok: true as const };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "No se pudo quitar el archivo." };
+  }
 }
 
 export async function deleteOpsPieceAction(formData: FormData) {
