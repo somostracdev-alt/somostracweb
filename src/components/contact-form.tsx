@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 
 import type { SiteContent } from "@/content/site";
+import { trackLead } from "@/lib/analytics";
 import { uiCopy, type Locale } from "@/lib/locale";
 
 function withMessage(href: string, text: string) {
@@ -30,6 +31,7 @@ export function ContactForm({ site, locale }: { site: SiteContent; locale: Local
     const zona = String(data.get("zona") || "").trim();
     const mensaje = String(data.get("mensaje") || "").trim();
     const text = copy.formMessage({ nombre, empresa, rubro, whatsapp, email, zona, mensaje });
+    trackLead();
     window.open(withMessage(site.contact.whatsappHref, text), "_blank", "noopener,noreferrer");
     setSent(true);
   }

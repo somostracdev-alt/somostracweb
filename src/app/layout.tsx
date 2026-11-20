@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Inter } from "next/font/google";
 
+import { AnalyticsEvents, AnalyticsScripts } from "@/components/analytics";
 import { getLocale } from "@/lib/locale-server";
 import "./globals.css";
 
@@ -39,6 +40,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang={locale === "en" ? "en" : "es-AR"} className={`${anton.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full bg-background font-sans text-base font-normal text-foreground">
+        <AnalyticsScripts />
+        <AnalyticsEvents />
         <script
           dangerouslySetInnerHTML={{
             __html: `try{if(localStorage.getItem("trac-theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}`,
